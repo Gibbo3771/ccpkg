@@ -47,7 +47,7 @@ if(command == "init") then
         return
     end
     if(fs.exists(path.."/pkg.json")) then
-        printError("A pkg.json already exists, a project has already been created in this directory")
+        printError("A project has already been created in this directory")
         return
     end
     init()
