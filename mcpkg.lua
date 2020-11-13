@@ -15,7 +15,6 @@ local vendorPath = fs.getDir(shell.getRunningProgram()).."/vendor"
 
 
 local function init()
-    print("Creating new project '"..arg.."'")
     
     function writeDefaultFile()
         local defaultPkgFile = {version = "1.0.0", dependencies = {}}
@@ -31,6 +30,7 @@ local function init()
         io.close(fh)
     end
     
+    print("Creating new project '"..arg.."'")
     writeDefaultFile()
 end
 
