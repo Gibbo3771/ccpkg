@@ -40,7 +40,7 @@ end
 local function install()
     
     function getFormula()
-        local req = http.get("https://github.com/Gibbo3771/pkgmc/blob/main/formula/"..arg)
+        local req = http.get("https://raw.githubusercontent.com/Gibbo3771/pkgmc/main/formula/"..arg..".lua")
         if(not req) then
             error("Could not download formula") 
         end
@@ -54,7 +54,7 @@ local function install()
     end
     
     function download()
-        local zip = http.get("https://github.com/Gibbo3771/pkgmc/blob/main/mcpkg.lua")
+        local formula = require(tmpPath.."/"..arg.."/"..arg)
         
     end
     
@@ -64,6 +64,7 @@ local function install()
     end
     
     getFormula()
+    download()
 end
 
 

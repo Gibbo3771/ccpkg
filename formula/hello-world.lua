@@ -1,10 +1,4 @@
-local helloWorld = {
-    name = "hello-world",
-    description = "This is an example formula",
-    versions = {
-        "latest" = ""
-    }
-}
+local helloWorld = {}
 
 -- Download the formula
 function hello:download()
