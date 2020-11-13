@@ -44,7 +44,7 @@ local function install()
         if(not req) then
             error("Could not download formula") 
         end
-        local fh, err = io.open(tmpPath.."/"..arg, "w")
+        local fh, err = io.open(tmpPath.."/"..arg.."/"..arg..".lua", "w")
         if(err) then
             printError("Could not create pkg file")
             error(err) 
