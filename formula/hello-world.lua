@@ -1,12 +1,12 @@
 local helloWorld = {}
 
 -- Download the formula
-function hello:download()
+function helloWorld:download()
     
 end
 
 -- Install the formula
-function hello:install()
+function helloWorld:install()
     
 end
 
