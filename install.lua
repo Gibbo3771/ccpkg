@@ -1,14 +1,14 @@
 local params = {...}
-local workingDir = "/.mcpkg"
+local workingDir = "/.ccpkg"
 
 local function updatePath()
     local paths = {
         package.path,
-        "/.mcpgk/?.lua",
-        "/.mcpgk/?"
+        "/.ccpgk/?.lua",
+        "/.ccpgk/?"
     }
     package.path = table.concat(paths, ";")
-    shell.setPath(shell.path()..":".."/.mcpkg/bin")
+    shell.setPath(shell.path()..":".."/.ccpkg/bin")
 end
 
 local function downloadDependencies()
@@ -16,7 +16,7 @@ local function downloadDependencies()
     local deps = {
         "https://raw.githubusercontent.com/MCJack123/CC-Archive/master/LibDeflate.lua",
         "https://raw.githubusercontent.com/MCJack123/CC-Archive/master/tar.lua",
-        "https://raw.githubusercontent.com/Gibbo3771/pkgmc/main/mcpkg.lua"
+        "https://raw.githubusercontent.com/Gibbo3771/ccpkg/main/ccpkg.lua"
     }
     for i, v in ipairs(deps) do
         local filename = v:match("^.+/(.+)$")
@@ -46,5 +46,5 @@ fs.makeDir(workingDir)
 updatePath()
 downloadDependencies()
 
-print("Successfully installed, you can run using the 'mcpkg' command") 
+print("Successfully installed, you can run using the 'ccpkg' command") 
 

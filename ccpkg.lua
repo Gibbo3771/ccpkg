@@ -15,6 +15,7 @@ local command = params[1]
 local path = shell.dir()
 local vendorPath = path.."/vendor"
 local varPath = path.."/var"
+local cachePath = "/.ccpkg"
 
 local function isProjectFolder()
     return fs.exists(path.."/pkg.json")
@@ -62,7 +63,7 @@ local function add(package)
     
     function getFormula(name)
         print("Looking for formula '"..name.."'...")
-        local req = http.get("https://raw.githubusercontent.com/Gibbo3771/pkgmc/main/formula/"..name..".lua")
+        local req = http.get("https://raw.githubusercontent.com/Gibbo3771/ccpkg/main/formula/"..name..".lua")
         if(not req) then
             error("Could not download formula") 
         end
@@ -71,7 +72,6 @@ local function add(package)
     end
     
     function download(url, name)
-        local tar = require("tar")
         print("Downloading package '"..name.."'...")
         local req = http.get(url)
         local fh, err = io.open(varPath.."/"..name.."-"..url:match("^.+/(.+)$"), "w")
@@ -123,7 +123,7 @@ if(command == "new") then
     return
 elseif(command == "add") then
     if(not isProjectFolder()) then
-        printError("Not in a project directory, run 'mcpkg init <project-name>' before trying to add packages")
+        printError("Not in a project directory, run 'ccpkg new <project-name>' before trying to add packages")
         return
     end
     local package = arg[2] or nil
