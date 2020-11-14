@@ -14,8 +14,7 @@ local command = params[1]
 
 local path = shell.dir()
 local vendorPath = path.."/vendor"
-local varPath = path.."/var"
-local cachePath = "/.ccpkg"
+local cachePath = "/.ccpkg/cache"
 
 local function isProjectFolder()
     return fs.exists(path.."/pkg.json")
@@ -29,11 +28,16 @@ local function split(s, delimiter)
     return result;
 end
 
+local function splitIntoNameAndVersion(package)
+    local pkg = split(package, "@")
+    if(not pkg[2]) then pkg[2] = "latest" end
+    return pkg
+end
+
 local function new(name)
     function createPackageFile()
         local defaultPkgFile = {version = "1.0.0", name = name, dependencies = {}}
         fs.makeDir(vendorPath)
-        fs.makeDir(varPath)
 
         local fh, err = io.open(path.."/pkg.json", "w")
         if(err) then
@@ -59,44 +63,48 @@ local function new(name)
     createEntryFile()
 end
 
-local function add(package)
-    
-    function getFormula(name)
-        print("Looking for formula '"..name.."'...")
-        local req = http.get("https://raw.githubusercontent.com/Gibbo3771/ccpkg/main/formula/"..name..".lua")
-        if(not req) then
-            error("Could not download formula") 
-        end
-        print("Found '"..name.."'")
-        return req.readAll()
+local function getFormula(name)
+    print("Looking for formula '"..name.."'...")
+    local req = http.get("https://raw.githubusercontent.com/Gibbo3771/ccpkg/main/formula/"..name..".lua")
+    if(not req) then
+        error("Could not download formula") 
     end
-    
-    function download(url, name)
-        print("Downloading package '"..name.."'...")
-        local req = http.get(url)
-        local fh, err = io.open(cachePath.."/"..url:match("^.+/(.+)$"), "w")
-        if(err) then
-            printError("Could not create entry file")
-            error(err) 
-        end
-        fh:write(req.readAll())
-        io.close(fh)
-        
-    end
-    
-    function install()
-        print("Installing "..arg.."...")
-        
-    end
+    print("Found '"..name.."'")
+    return req.readAll()
+end
 
-    local name, version = unpack(split(package, "@"))
-    if(not version) then version = "latest" end
+local function download(url, version, name)
+    print("Downloading package '"..name.."'...")
+    local path = cachePath.."/"..name.."-"..version
+    local req = http.get(url)
+    local fh, err = io.open(path..".tar.gz", "w")
+    if(err) then
+        printError("Could not create entry file")
+        error(err) 
+    end
+    fh:write(req.readAll())
+    io.close(fh)
+    return path
+end
+
+local function install(path)
+--    local tar = require("tar")
+    print("Installing")
+--    local t = tar.load(path..".tar.gz")
+--    tar.extract(t, "/extracted")
+end
+
+local function add(package)    
+    local name, version = unpack(splitIntoNameAndVersion(package))
+    print(version)
     local formula = getFormula(name)
     local func, err = load(formula)
     if func then
         local ok, f = pcall(func)
         if ok then
-            download(f.versions[version], name)
+            local downloadPath = download(f.versions[version], version, name)
+            print(downloadPath)
+            install(downloadPath)
             f:install(version)
         else
             error("Could not execute formula")
