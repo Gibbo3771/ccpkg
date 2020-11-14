@@ -35,7 +35,7 @@ local function createDefaultStartupFile()
             printError("Could not create startup file")
             error(err) 
         end
-    fh:write(startContent)
+    fh:write(startupContent)
     io.close(fh)
 
 end
@@ -43,8 +43,8 @@ end
 local function downloadDependencies()
     print("Downloading dependencies...")
     local deps = {
-        "https://raw.githubusercontent.com/MCJack123/CC-Archive/master/LibDeflate.lua",
-        "https://raw.githubusercontent.com/MCJack123/CC-Archive/master/tar.lua",
+        "https://raw.githubusercontent.com/Gibbo3771/CC-Archive/master/LibDeflate.lua",
+        "https://raw.githubusercontent.com/Gibbo3771/CC-Archive/master/tar.lua",
         "https://raw.githubusercontent.com/Gibbo3771/ccpkg/main/ccpkg.lua"
     }
     for i, v in ipairs(deps) do

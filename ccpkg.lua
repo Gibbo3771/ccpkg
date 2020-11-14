@@ -90,7 +90,7 @@ end
 local function install(path)
     local tar = require("tar")
     print("Installing")
-    local t = tar.load(path..".tar.gz")
+    local t = tar.decompressAndLoad(path..".tar.gz")
 end
 
 local function add(package)    
