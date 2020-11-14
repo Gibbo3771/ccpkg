@@ -35,7 +35,7 @@ local function createDefaultStartupFile()
             printError("Could not create startup file")
             error(err) 
         end
-    fh:write(startContent))
+    fh:write(startContent)
     io.close(fh)
 
 end
