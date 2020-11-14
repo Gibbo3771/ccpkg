@@ -46,5 +46,5 @@ fs.makeDir(workingDir)
 updatePath()
 downloadDependencies()
 
-print("mcpkg successfully installed, you can run using the 'mcpkg' command") 
+print("Successfully installed, you can run using the 'mcpkg' command") 
 

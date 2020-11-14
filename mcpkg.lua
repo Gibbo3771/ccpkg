@@ -48,7 +48,7 @@ local function add()
         print("Found '"..arg.."'")
         local fh, err = io.open(tmpPath.."/"..arg.."/"..arg..".lua", "w")
         if(err) then
-            printError("Could not create pkg file")
+            printError("Could not add formula")
             error(err) 
         end
         fh:write(req.readAll())
@@ -67,7 +67,6 @@ local function add()
     end
     
     getFormula()
-    download()
 end
 
 
