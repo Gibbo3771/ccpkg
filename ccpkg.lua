@@ -87,10 +87,12 @@ local function download(url, version, name)
     return path
 end
 
-local function install(path)
+local function install(name, path)
     local tar = require("tar")
     print("Installing")
-    local t = tar.decompressAndLoad(path..".tar.gz")
+    local t = tar.decompress(path..".tar.gz")
+    t = tar.load(t, false, true)
+    tar.extract(t, vendorPath.."/")
 end
 
 local function add(package)    
@@ -102,8 +104,7 @@ local function add(package)
         local ok, f = pcall(func)
         if ok then
             local downloadPath = download(f.versions[version], version, name)
-            print(downloadPath)
-            install(downloadPath)
+            install(name, downloadPath)
             f:install(version)
         else
             error("Could not execute formula")
@@ -111,6 +112,7 @@ local function add(package)
     else
         error("Could not compile formula")
     end
+    print(name.." has been added to your project as a dependency")
 end
 
 
