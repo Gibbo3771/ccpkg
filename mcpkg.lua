@@ -61,25 +61,26 @@ end
 local function add(package)
     
     function getFormula(name)
-        print("Looking for formula '"..name.."'")
+        print("Looking for formula '"..name.."'...")
         local req = http.get("https://raw.githubusercontent.com/Gibbo3771/pkgmc/main/formula/"..name..".lua")
         if(not req) then
             error("Could not download formula") 
         end
         print("Found '"..name.."'")
         return req.readAll()
---        local fh, err = io.open(tmpPath.."/"..arg.."/"..arg..".lua", "w")
---        if(err) then
---            printError("Could not add formula")
---            error(err) 
---        end
---        fh:write(req.readAll())
---        io.close(fh)
     end
     
-    function download()
-        print("Downloading package")
-        local formula = require(tmpPath.."/"..arg.."/"..arg)
+    function download(url, name)
+        print("Downloading package '"..name.."'...")
+        print(url:match("^.+/(.+)$"))
+        local req = http.get(url)
+        local fh, err = io.open(varPath.."/"..name.."-"..url:match("^.+/(.+)$"), "w")
+        if(err) then
+            printError("Could not create entry file")
+            error(err) 
+        end
+        fh:write(initFileContents)
+        io.close(fh)
         
     end
     
@@ -92,16 +93,16 @@ local function add(package)
     if(not version) then version = "latest" end
     local formula = getFormula(name)
     local func, err = load(formula)
-    print(formula)
     if func then
-        local ok, add = pcall(func)
+        local ok, f = pcall(func)
         if ok then
-            print(add(2,3))
+            download(f.versions[version], name)
+            f:install(version)
         else
-            print("Execution error:", add)
+            error("Could not execute formula")
         end
     else
-        print("Compilation error:", err)
+        error("Could not compile formula")
     end
 end
 

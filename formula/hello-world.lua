@@ -7,7 +7,10 @@ local helloWorld = {
     }
 }
 
--- Install the formula
+-- Install the formula, mcpkg will automatically add
+-- the package to the vendor/<package-name>/ folder
+-- under your project, any extra installation steps should
+-- be done here
 function helloWorld:install()
     
 end
