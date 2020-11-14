@@ -76,8 +76,8 @@ end
 local function download(url, version, name)
     print("Downloading package '"..name.."'...")
     local path = cachePath.."/"..name.."-"..version
-    local req = http.get(url)
-    local fh, err = io.open(path..".tar.gz", "w")
+    local req = http.get(url, nil, true)
+    local fh, err = io.open(path..".tar.gz", "wb")
     if(err) then
         printError("Could not create entry file")
         error(err) 
@@ -88,10 +88,9 @@ local function download(url, version, name)
 end
 
 local function install(path)
---    local tar = require("tar")
+    local tar = require("tar")
     print("Installing")
---    local t = tar.load(path..".tar.gz")
---    tar.extract(t, "/extracted")
+    local t = tar.load(path..".tar.gz")
 end
 
 local function add(package)    
