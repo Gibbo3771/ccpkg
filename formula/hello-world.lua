@@ -11,8 +11,9 @@ local helloWorld = {
 -- the package to the vendor/<package-name>/ folder
 -- under your project, any extra installation steps should
 -- be done here
-function helloWorld:install()
-    
+function helloWorld:install(version)
+    local vendorPath = shell.dir()
+    fs.move(vendorPath.."/".."mcpkg-hello-world-"..verson, vendorPath.."/".."hello-world")
 end
 
 return helloWorld

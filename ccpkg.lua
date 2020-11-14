@@ -90,8 +90,10 @@ end
 local function install(name, path)
     local tar = require("tar")
     print("Installing")
+    print("Decompressing archive..")
     local t = tar.decompress(path..".tar.gz")
     t = tar.load(t, false, true)
+    print("Extracting archive to "..vendorPath.."/"..name)
     tar.extract(t, vendorPath.."/")
 end
 
