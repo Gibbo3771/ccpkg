@@ -37,13 +37,15 @@ local function init()
     writeDefaultFile()
 end
 
-local function install()
+local function add()
     
     function getFormula()
+        print("Looking for formula '"..arg.."'")
         local req = http.get("https://raw.githubusercontent.com/Gibbo3771/pkgmc/main/formula/"..arg..".lua")
         if(not req) then
             error("Could not download formula") 
         end
+        print("Found '"..arg.."'")
         local fh, err = io.open(tmpPath.."/"..arg.."/"..arg..".lua", "w")
         if(err) then
             printError("Could not create pkg file")
@@ -54,6 +56,7 @@ local function install()
     end
     
     function download()
+        print("Downloading package")
         local formula = require(tmpPath.."/"..arg.."/"..arg)
         
     end
@@ -81,16 +84,16 @@ if(command == "init") then
     init()
     print("Finished, happy coding!")
     return
-elseif(command == "install") then
+elseif(command == "add") then
     if(not isProjectFolder()) then
-        printError("Not in a project directory, run 'mcpkg init <project-name>' before trying to install packages")
+        printError("Not in a project directory, run 'mcpkg init <project-name>' before trying to add packages")
         return
     end
     if(not arg) then
-        printError("Pass the name of the package you want to install")
+        printError("Pass the name of the package you want to add")
         return
     end
-    install()
+    add()
     return
 end
 
