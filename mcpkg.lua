@@ -5,24 +5,34 @@ if(table.getn(params) == 0) then
     return
 end
 
+local initFileContents = [=[
+-- This is your entry file for your project. You should call this from your
+-- startup file to get going
+]=]
+
 local command = params[1]
-local arg = params[2]
 
-
-local path = fs.getDir(shell.getRunningProgram())
-local vendorPath = fs.getDir(shell.getRunningProgram()).."/vendor"
-local tmpPath = fs.getDir(shell.getRunningProgram()).."/tmp"
+local path = shell.dir()
+local vendorPath = path.."/vendor"
+local varPath = path.."/var"
 
 local function isProjectFolder()
     return fs.exists(path.."/pkg.json")
 end
 
-local function init()
-    
-    function writeDefaultFile()
-        local defaultPkgFile = {version = "1.0.0", dependencies = {}}
+local function split(s, delimiter)
+    result = {};
+    for match in (s..delimiter):gmatch("(.-)"..delimiter) do
+        table.insert(result, match);
+    end
+    return result;
+end
+
+local function new(name)
+    function createPackageFile()
+        local defaultPkgFile = {version = "1.0.0", name = name, dependencies = {}}
         fs.makeDir(vendorPath)
-        fs.makeDir(path.."/var")
+        fs.makeDir(varPath)
 
         local fh, err = io.open(path.."/pkg.json", "w")
         if(err) then
@@ -33,26 +43,38 @@ local function init()
         io.close(fh)
     end
     
-    print("Creating new project '"..arg.."'")
-    writeDefaultFile()
+    function createEntryFile()
+        local fh, err = io.open(path.."/init.lua", "w")
+        if(err) then
+            printError("Could not create entry file")
+            error(err) 
+        end
+        fh:write(initFileContents)
+        io.close(fh)
+    end
+    
+    print("Creating new project '"..name.."'")
+    createPackageFile()
+    createEntryFile()
 end
 
-local function add()
+local function add(package)
     
-    function getFormula()
-        print("Looking for formula '"..arg.."'")
-        local req = http.get("https://raw.githubusercontent.com/Gibbo3771/pkgmc/main/formula/"..arg..".lua")
+    function getFormula(name)
+        print("Looking for formula '"..name.."'")
+        local req = http.get("https://raw.githubusercontent.com/Gibbo3771/pkgmc/main/formula/"..name..".lua")
         if(not req) then
             error("Could not download formula") 
         end
-        print("Found '"..arg.."'")
-        local fh, err = io.open(tmpPath.."/"..arg.."/"..arg..".lua", "w")
-        if(err) then
-            printError("Could not add formula")
-            error(err) 
-        end
-        fh:write(req.readAll())
-        io.close(fh)
+        print("Found '"..name.."'")
+        return req.readAll()
+--        local fh, err = io.open(tmpPath.."/"..arg.."/"..arg..".lua", "w")
+--        if(err) then
+--            printError("Could not add formula")
+--            error(err) 
+--        end
+--        fh:write(req.readAll())
+--        io.close(fh)
     end
     
     function download()
@@ -65,22 +87,37 @@ local function add()
         print("Installing "..arg.."...")
         
     end
-    
-    getFormula()
+
+    local name, version = unpack(split(package, "@"))
+    if(not version) then version = "latest" end
+    local formula = getFormula(name)
+    local func, err = load(formula)
+    print(formula)
+    if func then
+        local ok, add = pcall(func)
+        if ok then
+            print(add(2,3))
+        else
+            print("Execution error:", add)
+        end
+    else
+        print("Compilation error:", err)
+    end
 end
 
 
 
-if(command == "init") then
-    if(not arg) then
-        printError("You must specify a project name as the second argument when using init")
+if(command == "new") then
+    local name = params[2] or nil
+    if(not name) then
+        printError("You must specify a project name as the second argument")
         return
     end
     if(isProjectFolder()) then
         printError("A project has already been created in this directory")
         return
     end
-    init()
+    new(name)
     print("Finished, happy coding!")
     return
 elseif(command == "add") then
@@ -88,11 +125,12 @@ elseif(command == "add") then
         printError("Not in a project directory, run 'mcpkg init <project-name>' before trying to add packages")
         return
     end
-    if(not arg) then
+    local package = arg[2] or nil
+    if(not package) then
         printError("Pass the name of the package you want to add")
         return
     end
-    add()
+    add(package)
     return
 end
 

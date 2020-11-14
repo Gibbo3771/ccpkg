@@ -1,6 +1,6 @@
 local helloWorld = {
-    name = "hello-world",
-    description = "This is an example formula",
+    name = "hello-world";
+    description = "This is an example formula";
     versions = {
         "latest" = ""
     }
