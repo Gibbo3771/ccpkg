@@ -71,15 +71,15 @@ local function add(package)
     end
     
     function download(url, name)
+        local tar = require("tar")
         print("Downloading package '"..name.."'...")
-        print(url:match("^.+/(.+)$"))
         local req = http.get(url)
         local fh, err = io.open(varPath.."/"..name.."-"..url:match("^.+/(.+)$"), "w")
         if(err) then
             printError("Could not create entry file")
             error(err) 
         end
-        fh:write(initFileContents)
+        fh:write(req.readAll())
         io.close(fh)
         
     end
