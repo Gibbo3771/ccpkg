@@ -74,7 +74,7 @@ local function add(package)
     function download(url, name)
         print("Downloading package '"..name.."'...")
         local req = http.get(url)
-        local fh, err = io.open(varPath.."/"..name.."-"..url:match("^.+/(.+)$"), "w")
+        local fh, err = io.open(cachePath.."/"..url:match("^.+/(.+)$"), "w")
         if(err) then
             printError("Could not create entry file")
             error(err) 

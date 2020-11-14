@@ -45,6 +45,7 @@ end
 fs.makeDir(workingDir)
 updatePath()
 downloadDependencies()
+fs.delete(shell.dir().."/install.lua")
 
 print("Successfully installed, you can run using the 'ccpkg' command") 
 
