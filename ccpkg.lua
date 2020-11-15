@@ -9,9 +9,9 @@ local initFileContents = [=[
 -- This is your entry file for your project. You should call this from your
 -- startup file to get going
 local paths = {
-    package.path,
     "/#{path}/vendor/?.lua",
     "/#{path}/vendor/?",
+    package.path
 }
 package.path = table.concat(paths, ";") 
 ]=]
