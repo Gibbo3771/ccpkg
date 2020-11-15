@@ -104,7 +104,8 @@ local function new(name)
             printError("Could not create entry file")
             error(err) 
         end
-        fh:write(initFileContents:gsub("#{path}", shell.dir()))
+        local injected = initFileContents:gsub("#{path}", shell.dir())
+        fh:write(injection[0])
         io.close(fh)
     end
     
