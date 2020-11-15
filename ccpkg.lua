@@ -105,7 +105,7 @@ local function new(name)
             printError("Could not create entry file")
             error(err) 
         end
-        fh:write(initFileContents:gsub("#{}", name))
+        fh:write(initFileContents:gsub("#{path}", shell.resolve(shell.dir())))
         io.close(fh)
     end
     
