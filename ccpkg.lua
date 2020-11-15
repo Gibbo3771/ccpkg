@@ -10,11 +10,10 @@ local initFileContents = [=[
 -- startup file to get going
 local paths = {
     package.path,
-    "#{path}/vendor/?.lua",
-    "#{path}vendor/?",
+    "/#{path}/vendor/?.lua",
+    "/#{path}/vendor/?",
 }
 package.path = table.concat(paths, ";") 
-
 ]=]
 
 local command = params[1]
@@ -99,13 +98,13 @@ local function new(name)
         io.close(fh)
     end
     
-    function createEntryFile()
+    function createEntryFile()  
         local fh, err = io.open(path.."/init.lua", "w")
         if(err) then
             printError("Could not create entry file")
             error(err) 
         end
-        fh:write(initFileContents:gsub("#{path}", shell.resolve(shell.dir())))
+        fh:write(initFileContents:gsub("#{path}", shell.dir()))
         io.close(fh)
     end
     
@@ -182,7 +181,6 @@ local function add(package)
             addToPkgJson(name, version)
             download(f.versions[version], version, name)
             install(name, version, cachePath.."/"..name.."-"..version)
-            f:install(version)
         else
             error("Could not execute formula")
         end
