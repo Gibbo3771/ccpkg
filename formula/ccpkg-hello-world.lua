@@ -11,14 +11,16 @@ function helloWorld:stable()
    return "2.0.0"
 end
 
--- Install the formula, mcpkg will automatically add
--- the package to the vendor/<package-name>/ folder
--- under your project, any extra installation steps should
--- be done here
-function helloWorld:install(version)
-    -- TODO
-    -- local vendorPath = shell.dir()
-    -- fs.move(vendorPath.."/".."mcpkg-hello-world-"..verson, vendorPath.."/".."hello-world")
+-- TODO
+-- This hook is called right after the package has been installed
+function helloWorld:postInstall(version)
+    -- Do some stuff
+end
+
+-- TODO
+-- This hook is called right before the package is installed
+function helloWorld:preInstall(version)
+    -- Do some stuff
 end
 
 return helloWorld
