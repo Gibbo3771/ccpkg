@@ -14,9 +14,10 @@ local command = params[1]
 
 local path = shell.dir()
 local vendorPath = path.."/vendor"
-local cachePath = "/.ccpkg/cache"
+local cachePath = "/ccpkg/cache"
 
 local function isProjectFolder()
+    print(path)
     return fs.exists(path.."/pkg.json")
 end
 
@@ -37,14 +38,11 @@ local function splitIntoNameAndVersion(package)
 end
 
 local function addToPkgJson(name, version)
-    print(shell.resolve(path.."/pkg.json"))
-    local fh, err = io.open(path.."/pkg.json", "r")
+    local fh, err = io.open(shell.resolve("pkg.json"), "r")
     if(err) then print(err) end
-    local json = fh:read()
-    print(json)
---    local current = textutils.unserialiseJSON(fh:read())
+    local current = textutils.unserialiseJSON(fh:read())
     io.close(fh)
-    print(json.name)
+    print(current.name)
 end
 
 -- TODO if created with the current directory as the name argument, we
