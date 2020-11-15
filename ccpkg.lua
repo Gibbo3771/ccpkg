@@ -37,6 +37,9 @@ local function splitIntoNameAndVersion(package)
     return pkg
 end
 
+-- Adds a dependency to the pkg file
+-- @param name the name of the package
+-- @param version the version of the package
 local function addToPkgJson(name, version)
     
     function parse()
@@ -57,7 +60,16 @@ local function addToPkgJson(name, version)
     end
     
     local pkg = parse()
-    pkg.dependencies[name] = version
+    if(pkg.dependencies[name]) then    
+--        TODO check version differences
+--        if(pkg.dependencies[name] ~= version) then
+--        else
+            print("You already have "..name.."@"..version.." as a dependency")
+            error()
+--        end
+    else
+        pkg.dependencies[name] = version
+    end
     update(pkg)
 end
 
@@ -161,7 +173,6 @@ local function add(package)
             if(version == "stable") then
                 version = f.stable()
             end
-            print(version)
             addToPkgJson(name, version)
             download(f.versions[version], version, name)
             install(name, version, cachePath.."/"..name.."-"..version)
