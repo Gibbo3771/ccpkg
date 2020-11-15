@@ -1,5 +1,6 @@
 # ccpkg - a Computer Craft powered package manager
 
+
 An early work in progress for a lua package manager specifically for Computer Craft (CC).
 
 ccpkg will allow CC programmers to come together and share common code without having the problems associated with pastebin. Manage each version through the central "repository" (lives [here](https://github.com/Gibbo3771/ccpkg/tree/main/formula)) using lua scripts, add, remove and update packages on the fly.
@@ -99,4 +100,9 @@ Lots. There is some modification of `package.path` and what not, and I am not su
 **IT WILL NUKE YOUR `/startup` FILE**. A custom startup file is required (kinda like a bashrc) to setup paths and what not. You can append to this one instead.
 
 My only package sucks. And there is no "global" installation, however this is going to be my next plan as I suspect majority of uses for this is to hold complete programs, rather than API/SDK stuff.
+
+## NOTE
+
+I still have to give credit where credit is due, thanks to [CC-Tweaked](https://github.com/Gibbo3771/CC-Tweaked) for keeping the CC mod alive in newer versions and thanks to [CC-Arhive](https://github.com/MCJack123/CC-Archive) for the gzip/tar implementation. I will put this in a proper blurb soon.
+
 
