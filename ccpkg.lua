@@ -37,29 +37,28 @@ local function splitIntoNameAndVersion(package)
     return pkg
 end
 
+local function parsePkgJson()
+    local fh, err = io.open(shell.resolve("pkg.json"), "r")
+    if(err) then print(err) end
+    local json = textutils.unserialiseJSON(fh:read())
+    io.close(fh)
+    return json
+end
+
+local function updatePkgJson(pkg)
+    local fh, err = io.open(shell.resolve("pkg.json"), "w")
+    if(err) then print(err) end
+    local json = textutils.serializeJSON(pkg)
+    fh:write(json)
+    io.close(fh)
+    return json
+end
+
 -- Adds a dependency to the pkg file
 -- @param name the name of the package
 -- @param version the version of the package
 local function addToPkgJson(name, version)
-    
-    function parse()
-        local fh, err = io.open(shell.resolve("pkg.json"), "r")
-        if(err) then print(err) end
-        local json = textutils.unserialiseJSON(fh:read())
-        io.close(fh)
-        return json
-    end
-    
-    function update(pkg)
-        local fh, err = io.open(shell.resolve("pkg.json"), "w")
-        if(err) then print(err) end
-        local json = textutils.serializeJSON(pkg)
-        fh:write(json)
-        io.close(fh)
-        return json
-    end
-    
-    local pkg = parse()
+    local pkg = parsePkgJson()
     if(pkg.dependencies[name]) then    
 --        TODO check version differences
 --        if(pkg.dependencies[name] ~= version) then
@@ -70,7 +69,7 @@ local function addToPkgJson(name, version)
     else
         pkg.dependencies[name] = version
     end
-    update(pkg)
+    updatePkgJson(pkg)
 end
 
 -- TODO if created with the current directory as the name argument, we
@@ -186,6 +185,18 @@ local function add(package)
     print(name.." has been added to your project as a dependency")
 end
 
+local function remove(name)
+    local pkg = parsePkgJson()
+    local deps = pkg.dependencies
+    if(not deps[name]) then
+        print("You do not have "..name.." as a dependency") 
+    else
+        deps[name] = nil
+        updatePkgJson(pkg)
+        fs.delete(vendorPath.."/"..name)
+        print("Removed successfully")
+    end
+end
 
 
 if(command == "new") then
@@ -212,6 +223,18 @@ elseif(command == "add") then
         return
     end
     add(package)
+    return
+elseif(command == "remove") then
+    if(not isProjectFolder()) then
+        printError("Not in a project directory, run 'ccpkg new <project-name>' before trying to add packages")
+        return
+    end
+    local package = arg[2] or nil
+    if(not package) then
+        printError("Pass the name of the package you want to remove")
+        return
+    end
+    remove(package)
     return
 end
 
