@@ -33,16 +33,32 @@ end
 -- @param package the string contain the package name and version separated by an @
 local function splitIntoNameAndVersion(package)
     local pkg = split(package, "@")
-    if(not pkg[2]) then pkg[2] = "latest" end
+    if(not pkg[2]) then pkg[2] = "stable" end
     return pkg
 end
 
 local function addToPkgJson(name, version)
-    local fh, err = io.open(shell.resolve("pkg.json"), "r")
-    if(err) then print(err) end
-    local current = textutils.unserialiseJSON(fh:read())
-    io.close(fh)
-    print(current.name)
+    
+    function parse()
+        local fh, err = io.open(shell.resolve("pkg.json"), "r")
+        if(err) then print(err) end
+        local json = textutils.unserialiseJSON(fh:read())
+        io.close(fh)
+        return json
+    end
+    
+    function update(pkg)
+        local fh, err = io.open(shell.resolve("pkg.json"), "w")
+        if(err) then print(err) end
+        local json = textutils.serializeJSON(pkg)
+        fh:write(json)
+        io.close(fh)
+        return json
+    end
+    
+    local pkg = parse()
+    pkg.dependencies[name] = version
+    update(pkg)
 end
 
 -- TODO if created with the current directory as the name argument, we
@@ -135,21 +151,26 @@ end
 
 local function add(package)    
     local name, version = unpack(splitIntoNameAndVersion(package))
-    addToPkgJson(name, version)
---    local formula = getFormula(name)
---    local func, err = load(formula)
---    if func then
---        local ok, f = pcall(func)
---        if ok then
---            download(f.versions[version], version, name)
---            install(name, version, cachePath.."/"..name.."-"..version)
---            f:install(version)
---        else
---            error("Could not execute formula")
---        end
---    else
---        error("Could not compile formula")
---    end
+    local formula = getFormula(name)
+    local func, err = load(formula)
+    if func then
+        local ok, f = pcall(func)
+        if ok then
+            -- If no version is passed, we set it to resolve
+            -- to whatever version the formula specifies as "stable"
+            if(version == "stable") then
+                version = f.stable()
+            end
+            addToPkgJson(name, version)
+            download(f.versions[version], version, name)
+            install(name, version, cachePath.."/"..name.."-"..version)
+            f:install(version)
+        else
+            error("Could not execute formula")
+        end
+    else
+        error("Could not compile formula")
+    end
     print(name.." has been added to your project as a dependency")
 end
 
