@@ -43,7 +43,9 @@ require("example.init")
 Below is the list of commands you can run:
 
 `ccpkg new <project-name>` - Create a new project with the given name (*this does not create a folder!*)
+
 `ccpkg add <package-name>` - Add a package to your project as a dependency
+
 `ccpkg remove <package-name>` - Remove a package
 
 That's pretty much it.
