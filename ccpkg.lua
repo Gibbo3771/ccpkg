@@ -28,12 +28,20 @@ local function split(s, delimiter)
     return result;
 end
 
+-- Splits the package name from the version number
+-- @param package the string contain the package name and version separated by an @
 local function splitIntoNameAndVersion(package)
     local pkg = split(package, "@")
     if(not pkg[2]) then pkg[2] = "latest" end
     return pkg
 end
 
+-- TODO if created with the current directory as the name argument, we
+-- we should use the folder name as the project name, if anything else
+-- we should create a folder for it instead
+--
+-- Creates a new project
+-- @param name the name of the project
 local function new(name)
     function createPackageFile()
         local defaultPkgFile = {version = "1.0.0", name = name, dependencies = {}}
@@ -63,6 +71,8 @@ local function new(name)
     createEntryFile()
 end
 
+-- Downloads a formula from the main repository
+-- @param name the name of the formula
 local function getFormula(name)
     print("Looking for formula '"..name.."'...")
     local req = http.get("https://raw.githubusercontent.com/Gibbo3771/ccpkg/main/formula/"..name..".lua")
@@ -73,6 +83,10 @@ local function getFormula(name)
     return req.readAll()
 end
 
+-- download the tar.gz from the github release
+-- @param url the download url
+-- @param versionthe version being downloaded
+-- @param name the name of the package
 local function download(url, version, name)
     print("Downloading package '"..name.."'...")
     local path = cachePath.."/"..name.."-"..version
@@ -84,10 +98,14 @@ local function download(url, version, name)
     end
     fh:write(req.readAll())
     io.close(fh)
-    return path
 end
 
-local function install(name, path)
+-- Installs a package for a project
+-- @param name the name of the package
+-- @param version the version
+-- @param name the name of the package
+-- @param path the location of the package artifacts
+local function install(name, version, path)
     local tar = require("tar")
     print("Installing")
     print("Decompressing archive..")
@@ -95,6 +113,15 @@ local function install(name, path)
     t = tar.load(t, false, true)
     print("Extracting archive to "..vendorPath.."/"..name)
     tar.extract(t, vendorPath.."/")
+    local files = fs.list(vendorPath.."/")
+    -- When downloaded from github the tar contains a version
+    -- folder, we remove the version number to allow
+    -- module references
+    for _, file in pairs(files) do
+       if(string.find(file, name, 1, true)) then
+            fs.move(vendorPath.."/"..file, vendorPath.."/"..name)
+        end
+    end
 end
 
 local function add(package)    
@@ -105,8 +132,8 @@ local function add(package)
     if func then
         local ok, f = pcall(func)
         if ok then
-            local downloadPath = download(f.versions[version], version, name)
-            install(name, downloadPath)
+            download(f.versions[version], version, name)
+            install(name, version, cachePath.."/"..name.."-"..version)
             f:install(version)
         else
             error("Could not execute formula")
