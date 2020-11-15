@@ -8,7 +8,7 @@ local helloWorld = {
 }
 
 function helloWorld:stable()
-   return helloWorld.versions["2.0.0"] 
+   return "2.0.0"
 end
 
 -- Install the formula, mcpkg will automatically add

@@ -161,6 +161,7 @@ local function add(package)
             if(version == "stable") then
                 version = f.stable()
             end
+            print(version)
             addToPkgJson(name, version)
             download(f.versions[version], version, name)
             install(name, version, cachePath.."/"..name.."-"..version)
