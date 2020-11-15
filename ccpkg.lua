@@ -36,6 +36,17 @@ local function splitIntoNameAndVersion(package)
     return pkg
 end
 
+local function addToPkgJson(name, version)
+    print(shell.resolve(path.."/pkg.json"))
+    local fh, err = io.open(path.."/pkg.json", "r")
+    if(err) then print(err) end
+    local json = fh:read()
+    print(json)
+--    local current = textutils.unserialiseJSON(fh:read())
+    io.close(fh)
+    print(json.name)
+end
+
 -- TODO if created with the current directory as the name argument, we
 -- we should use the folder name as the project name, if anything else
 -- we should create a folder for it instead
@@ -126,21 +137,21 @@ end
 
 local function add(package)    
     local name, version = unpack(splitIntoNameAndVersion(package))
-    print(version)
-    local formula = getFormula(name)
-    local func, err = load(formula)
-    if func then
-        local ok, f = pcall(func)
-        if ok then
-            download(f.versions[version], version, name)
-            install(name, version, cachePath.."/"..name.."-"..version)
-            f:install(version)
-        else
-            error("Could not execute formula")
-        end
-    else
-        error("Could not compile formula")
-    end
+    addToPkgJson(name, version)
+--    local formula = getFormula(name)
+--    local func, err = load(formula)
+--    if func then
+--        local ok, f = pcall(func)
+--        if ok then
+--            download(f.versions[version], version, name)
+--            install(name, version, cachePath.."/"..name.."-"..version)
+--            f:install(version)
+--        else
+--            error("Could not execute formula")
+--        end
+--    else
+--        error("Could not compile formula")
+--    end
     print(name.." has been added to your project as a dependency")
 end
 

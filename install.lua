@@ -1,5 +1,5 @@
 local params = {...}
-local workingDir = "/.ccpkg"
+local workingDir = "/ccpkg"
 
 -- This will be injected into a default startup file
 local startupContent = [=[
@@ -8,21 +8,21 @@ local startupContent = [=[
 -- of ccpkg programs
 local paths = {
     package.path,
-    "/.ccpgk/?.lua",
-    "/.ccpgk/?"
+    "/ccpgk/?.lua",
+    "/ccpgk/?"
 }
 package.path = table.concat(paths, ";")
-shell.setPath(shell.path()..":".."/.ccpkg/bin")    
+shell.setPath(shell.path()..":".."/ccpkg/bin")    
 ]=]
 
 local function updatePath()
     local paths = {
         package.path,
-        "/.ccpgk/?.lua",
-        "/.ccpgk/?"
+        "/ccpgk/?.lua",
+        "/ccpgk/?"
     }
     package.path = table.concat(paths, ";")
-    shell.setPath(shell.path()..":".."/.ccpkg/bin") 
+    shell.setPath(shell.path()..":".."/ccpkg/bin") 
 end
 
 local function createDefaultStartupFile()
