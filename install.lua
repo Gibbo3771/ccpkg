@@ -12,7 +12,9 @@ local paths = {
     "/ccpgk/?"
 }
 package.path = table.concat(paths, ";")
-shell.setPath(shell.path()..":".."/ccpkg/bin")    
+shell.setPath(shell.path()..":".."/ccpkg/bin")  
+
+-- Below here you can add your own code to run at startup
 ]=]
 
 local function updatePath()
@@ -30,7 +32,7 @@ local function createDefaultStartupFile()
         print("Detected exisiting startup file, backing it up to /startup.bak.lua")
         fs.move("/startup", "/startup.bak.lua")
     end
-    local fh, err = io.open("/startup", "w")
+    local fh, err = io.open("/startup.lua", "w")
         if(err) then
             printError("Could not create startup file")
             error(err) 

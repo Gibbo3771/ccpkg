@@ -8,6 +8,13 @@ end
 local initFileContents = [=[
 -- This is your entry file for your project. You should call this from your
 -- startup file to get going
+local paths = {
+    package.path,
+    "#{path}/vendor/?.lua",
+    "#{path}vendor/?",
+}
+package.path = table.concat(paths, ";") 
+
 ]=]
 
 local command = params[1]
@@ -98,7 +105,7 @@ local function new(name)
             printError("Could not create entry file")
             error(err) 
         end
-        fh:write(initFileContents)
+        fh:write(initFileContents:gsub("#{}", name))
         io.close(fh)
     end
     
