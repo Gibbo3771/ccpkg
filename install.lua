@@ -12,14 +12,6 @@ shell.setPath(shell.path()..":".."/ccpkg/bin")
 ]=]
 
 local function updatePath()
-    local paths = {
-        package.path,
-        "/ccpgk/?.lua",
-        "/ccpgk/?",
-        "/ccpgk/global/vendor/?",
-        "/ccpgk/global/vendor/?.lua"
-    }
-    package.path = table.concat(paths, ";")
     shell.setPath(shell.path()..":".."/ccpkg/bin") 
 end
 
@@ -74,8 +66,8 @@ fs.makeDir(workingDir.."/cache")
 fs.makeDir(workingDir.."/tmp")
 
 
-createDefaultStartupFile() deprecated
-updatePath() -- deprecated
+createDefaultStartupFile()
+updatePath()
 downloadDependencies()
 print("Cleaning up")
 fs.delete(shell.dir().."/install.lua")
