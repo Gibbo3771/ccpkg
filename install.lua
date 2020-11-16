@@ -79,6 +79,7 @@ fs.makeDir(workingDir.."/cache")
 createDefaultStartupFile()
 updatePath()
 downloadDependencies()
+print("Cleaning up")
 fs.delete(shell.dir().."/install.lua")
 
 print("Successfully installed, you can run using the 'ccpkg' command") 

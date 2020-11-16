@@ -1,4 +1,5 @@
 local params = {...}
+local ccpkg = {}
 
 if(table.getn(params) == 0) then
     print("No command passed")
@@ -43,7 +44,7 @@ local function splitIntoNameAndVersion(package)
     return pkg
 end
 
-local function parsePkgJson()
+function ccpkg.parsePkgJson()
     local fh, err = io.open(shell.resolve("pkg.json"), "r")
     if(err) then print(err) end
     local json = textutils.unserialiseJSON(fh:read())
@@ -51,7 +52,7 @@ local function parsePkgJson()
     return json
 end
 
-local function updatePkgJson(pkg)
+function ccpkg.updatePkgJson(pkg)
     local fh, err = io.open(shell.resolve("pkg.json"), "w")
     if(err) then print(err) end
     local json = textutils.serializeJSON(pkg)
@@ -63,28 +64,51 @@ end
 -- Adds a dependency to the pkg file
 -- @param name the name of the package
 -- @param version the version of the package
-local function addToPkgJson(name, version)
-    local pkg = parsePkgJson()
+function ccpkg.addToPkgJson(name, version)
+    local pkg = ccpkg.parsePkgJson()
     if(pkg.dependencies[name]) then    
---        TODO check version differences
---        if(pkg.dependencies[name] ~= version) then
---        else
+        if(pkg.dependencies[name] ~= version) then
+            print("You already have")
+        else
             print("You already have "..name.."@"..version.." as a dependency")
             error()
---        end
+        end
     else
         pkg.dependencies[name] = version
     end
-    updatePkgJson(pkg)
+    ccpkg.updatePkgJson(pkg)
 end
 
--- TODO if created with the current directory as the name argument, we
--- we should use the folder name as the project name, if anything else
--- we should create a folder for it instead
---
--- Creates a new project
--- @param name the name of the project
-local function new(name)
+-- Downloads a formula from the main repository
+-- @param name the name of the formula
+function ccpkg.getFormula(name)
+    print("Looking for formula '"..name.."'...")
+    local req = http.get("https://raw.githubusercontent.com/Gibbo3771/ccpkg/main/formula/"..name..".lua")
+    if(not req) then
+        error("Could not download formula") 
+    end
+    print("Found '"..name.."'")
+    return req.readAll()
+end
+
+-- download the tar.gz from the github release
+-- @param url the download url
+-- @param versionthe version being downloaded
+-- @param name the name of the package
+function ccpkg.download(url, version, name)
+    print("Downloading package '"..name.."'...")
+    local path = cachePath.."/"..name.."-"..version
+    local req = http.get(url, nil, true)
+    local fh, err = io.open(path..".tar.gz", "wb")
+    if(err) then
+        printError("Could not create entry file")
+        error(err) 
+    end
+    fh:write(req.readAll())
+    io.close(fh)
+end
+
+function ccpkg.new(name)
     function createPackageFile()
         local defaultPkgFile = {version = "1.0.0", name = name, dependencies = {}}
         fs.makeDir(vendorPath)
@@ -105,42 +129,15 @@ local function new(name)
             error(err) 
         end
         local injected = initFileContents:gsub("#{path}", shell.dir())
-        fh:write(injection[0])
+        fh:write(injected)
         io.close(fh)
     end
     
     print("Creating new project '"..name.."'")
     createPackageFile()
     createEntryFile()
-end
-
--- Downloads a formula from the main repository
--- @param name the name of the formula
-local function getFormula(name)
-    print("Looking for formula '"..name.."'...")
-    local req = http.get("https://raw.githubusercontent.com/Gibbo3771/ccpkg/main/formula/"..name..".lua")
-    if(not req) then
-        error("Could not download formula") 
-    end
-    print("Found '"..name.."'")
-    return req.readAll()
-end
-
--- download the tar.gz from the github release
--- @param url the download url
--- @param versionthe version being downloaded
--- @param name the name of the package
-local function download(url, version, name)
-    print("Downloading package '"..name.."'...")
-    local path = cachePath.."/"..name.."-"..version
-    local req = http.get(url, nil, true)
-    local fh, err = io.open(path..".tar.gz", "wb")
-    if(err) then
-        printError("Could not create entry file")
-        error(err) 
-    end
-    fh:write(req.readAll())
-    io.close(fh)
+    local pkg = ccpkg.parsePkgJson()
+    ccpkg.updatePkgJson(pkg)
 end
 
 -- Installs a package for a project
@@ -148,7 +145,7 @@ end
 -- @param version the version
 -- @param name the name of the package
 -- @param path the location of the package artifacts
-local function install(name, version, path)
+function ccpkg.install(name, version, path)
     local tar = require("tar")
     print("Installing")
     print("Decompressing archive..")
@@ -167,9 +164,9 @@ local function install(name, version, path)
     end
 end
 
-local function add(package)    
+function ccpkg.add(package)    
     local name, version = unpack(splitIntoNameAndVersion(package))
-    local formula = getFormula(name)
+    local formula = ccpkg.getFormula(name)
     local func, err = load(formula)
     if func then
         local ok, f = pcall(func)
@@ -179,9 +176,9 @@ local function add(package)
             if(version == "stable") then
                 version = f.stable()
             end
-            addToPkgJson(name, version)
-            download(f.versions[version], version, name)
-            install(name, version, cachePath.."/"..name.."-"..version)
+            ccpkg.addToPkgJson(name, version)
+            ccpkg.download(f.versions[version], version, name)
+            ccpkg.install(name, version, cachePath.."/"..name.."-"..version)
         else
             error("Could not execute formula")
         end
@@ -191,17 +188,21 @@ local function add(package)
     print(name.." has been added to your project as a dependency")
 end
 
-local function remove(name)
-    local pkg = parsePkgJson()
-    local deps = pkg.dependencies
+function ccpkg.remove(name)
+    local pkg = ccpkg.parsePkgJson()
+    local deps = ccpkg.pkg.dependencies
     if(not deps[name]) then
         print("You do not have "..name.." as a dependency") 
     else
         deps[name] = nil
-        updatePkgJson(pkg)
+        ccpkg.updatePkgJson(pkg)
         fs.delete(vendorPath.."/"..name)
         print("Removed successfully")
     end
+end
+
+function ccpkg.run()
+    shell.run("/"..shell.resolve("init.lua"))
 end
 
 
@@ -215,7 +216,7 @@ if(command == "new") then
         printError("A project has already been created in this directory")
         return
     end
-    new(name)
+    ccpkg.new(name)
     print("Finished, happy coding!")
     return
 elseif(command == "add") then
@@ -228,7 +229,7 @@ elseif(command == "add") then
         printError("Pass the name of the package you want to add")
         return
     end
-    add(package)
+    ccpkg.add(package)
     return
 elseif(command == "remove") then
     if(not isProjectFolder()) then
@@ -240,7 +241,14 @@ elseif(command == "remove") then
         printError("Pass the name of the package you want to remove")
         return
     end
-    remove(package)
+    ccpkg.remove(package)
+    return
+elseif(command == "run") then
+    if(not isProjectFolder()) then
+        printError("Not in a project directory, run 'ccpkg new <project-name>' before trying to add packages")
+        return
+    end
+    ccpkg.run()
     return
 end
 
