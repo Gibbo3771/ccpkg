@@ -22,6 +22,8 @@ local command = params[1]
 local path = shell.dir()
 local vendorPath = path.."/vendor"
 local cachePath = "/ccpkg/cache"
+-- If global has been passed as the base command
+local isGlobal = false
 
 local function isProjectFolder()
     print(path)
@@ -190,7 +192,7 @@ end
 
 function ccpkg.remove(name)
     local pkg = ccpkg.parsePkgJson()
-    local deps = ccpkg.pkg.dependencies
+    local deps = pkg.dependencies
     if(not deps[name]) then
         print("You do not have "..name.." as a dependency") 
     else
@@ -220,11 +222,18 @@ if(command == "new") then
     print("Finished, happy coding!")
     return
 elseif(command == "add") then
-    if(not isProjectFolder()) then
+    local sub = params[2] or nil  -- subcommand
+    local package
+    if(sub and sub == "global") then 
+        isGlobal = true
+        package = params[3] -- the package to remove
+    else
+        package = params[2] -- no global sub command, second arg must be the package
+    end
+    if(not isProjectFolder() and not isGlobal) then
         printError("Not in a project directory, run 'ccpkg new <project-name>' before trying to add packages")
         return
     end
-    local package = arg[2] or nil
     if(not package) then
         printError("Pass the name of the package you want to add")
         return
@@ -232,13 +241,16 @@ elseif(command == "add") then
     ccpkg.add(package)
     return
 elseif(command == "remove") then
-    if(not isProjectFolder()) then
-        printError("Not in a project directory, run 'ccpkg new <project-name>' before trying to add packages")
-        return
+    local sub = params[2] or nil -- subcommand
+    local package
+    if(sub and sub == "global") then 
+        isGlobal = true
+        package = params[3] -- the package to remove
+    else
+        package = params[2] -- no global sub command, second arg must be the package
     end
-    local package = arg[2] or nil
-    if(not package) then
-        printError("Pass the name of the package you want to remove")
+    if(not isProjectFolder() and not isGlobal) then
+        printError("Not in a project directory, run 'ccpkg new <project-name>'")
         return
     end
     ccpkg.remove(package)
@@ -249,20 +261,6 @@ elseif(command == "run") then
         return
     end
     ccpkg.run()
-    return
-elseif(command == "global") then
-    local arg = params[2] or nil
-    if(not arg) then 
-        print("You must supply a command to run under the global context") 
-        return
-    end
-    if(arg == "add") then
-        
-    elseif(arg == "remove") then
-        
-    else
-        print("Unrecongized subcommand "..arg)        
-    end
     return
 end
 
