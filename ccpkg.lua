@@ -15,7 +15,7 @@ local initFileContents = [=[
 -- \____/ \___/ \___/ \__|___/\__|_|  \__,_| .__/| .__/ \___|\__,_|
 --                                         | |   | |               
 --                                         |_|   |_|               
---              _                              _                
+--                 _                              _                
 --                (_)                            | |               
 --       _   _ ___ _ _ __   __ _    ___ ___ _ __ | | ____ _        
 --      | | | / __| | '_ \ / _` |  / __/ __| '_ \| |/ / _` |       
@@ -63,7 +63,6 @@ local globalPath = "/ccpkg/global"
 local isGlobal = false
 
 local function isProjectFolder()
-    print(path)
     return fs.exists(path.."/pkg.json")
 end
 
@@ -160,7 +159,6 @@ function ccpkg.new(name)
     function createPackageFile()
         local defaultPkgFile = {version = "1.0.0", name = name, dependencies = {}}
         fs.makeDir(vendorPath)
-
         local fh, err = io.open(path.."/pkg.json", "w")
         if(err) then
             printError("Could not create pkg file")
