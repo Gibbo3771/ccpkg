@@ -250,6 +250,20 @@ elseif(command == "run") then
     end
     ccpkg.run()
     return
+elseif(command == "global") then
+    local arg = params[2] or nil
+    if(not arg) then 
+        print("You must supply a command to run under the global context") 
+        return
+    end
+    if(arg == "add") then
+        
+    elseif(arg == "remove") then
+        
+    else
+        print("Unrecongized subcommand "..arg)        
+    end
+    return
 end
 
 print("Unrecongized command "..command)
