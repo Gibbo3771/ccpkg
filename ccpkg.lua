@@ -74,13 +74,18 @@ end
 -- @param version the version of the package
 function ccpkg.addToPkgJson(name, version)
     local pkg = ccpkg.parsePkgJson()
-    if(pkg.dependencies[name]) then    
+    if(pkg.dependencies[name]) then
         if(pkg.dependencies[name] ~= version) then
-            print("You already have")
+            print("You already have this package installed as a different version")
         else
-            print("You already have "..name.."@"..version.." as a dependency")
-            error()
+            if(isGlobal) then
+                print("You already have "..name.."@"..version.." installed globally")
+            else
+                print("You already have "..name.."@"..version.." as a dependency")
+            end
         end
+        -- TODO graceful failures
+        error()
     else
         pkg.dependencies[name] = version
     end
@@ -159,15 +164,17 @@ function ccpkg.install(name, version, path)
     print("Decompressing archive..")
     local t = tar.decompress(path..".tar.gz")
     t = tar.load(t, false, true)
-    print("Extracting archive to "..vendorPath.."/"..name)
-    tar.extract(t, vendorPath.."/")
-    local files = fs.list(vendorPath.."/")
+    print("Extracting archive")
+    local path
+    if(isGlobal) then path = globalPath.."/vendor/" else path = vendorPath.."/" end
+    tar.extract(t, path)
+    local files = fs.list(path)
     -- When downloaded from github the tar contains a version
     -- folder, we remove the version number to allow
     -- module references
     for _, file in pairs(files) do
        if(string.find(file, name, 1, true)) then
-            fs.move(vendorPath.."/"..file, vendorPath.."/"..name)
+            fs.move(path..file, path..name)
         end
     end
 end
