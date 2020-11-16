@@ -7,14 +7,49 @@ if(table.getn(params) == 0) then
 end
 
 local initFileContents = [=[
--- This is your entry file for your project. You should call this from your
--- startup file to get going
+-- ______             _       _                                  _ 
+-- | ___ \           | |     | |                                | |
+-- | |_/ / ___   ___ | |_ ___| |_ _ __ __ _ _ __  _ __   ___  __| |
+-- | ___ \/ _ \ / _ \| __/ __| __| '__/ _` | '_ \| '_ \ / _ \/ _` |
+-- | |_/ / (_) | (_) | |_\__ \ |_| | | (_| | |_) | |_) |  __/ (_| |
+-- \____/ \___/ \___/ \__|___/\__|_|  \__,_| .__/| .__/ \___|\__,_|
+--                                         | |   | |               
+--                                         |_|   |_|               
+--              _                              _                
+--                (_)                            | |               
+--       _   _ ___ _ _ __   __ _    ___ ___ _ __ | | ____ _        
+--      | | | / __| | '_ \ / _` |  / __/ __| '_ \| |/ / _` |       
+--      | |_| \__ \ | | | | (_| | | (_| (__| |_) |   < (_| |       
+--       \__,_|___/_|_| |_|\__, |  \___\___| .__/|_|\_\__, |       
+--                          __/ |          | |         __/ |       
+--                         |___/           |_|        |___/        
+--
+--
+-- Created By: Stephen Gibson
+-- Github: https://github.com/Gibbo3771/ccpkg
+-- Docs: https://github.com/Gibbo3771/ccpkg/blob/main/README.md
+-- Issues: https://github.com/Gibbo3771/ccpkg/issues
+-- 
+--
+-- This is your entry file for your project.
+-- You can call this from your startup file or call it directly from
+-- the terminal.
+
+-- AUTO GENERATED DO NOT EDIT OR DELETE
+-- If you must modify the path, ensure you do not remove existing entries
+-- as this will break ccpkg module resolution
 local paths = {
-    "/#{path}/vendor/?.lua",
+    "/#{path}/vendor/?.lua", -- Always resolve local modules first
     "/#{path}/vendor/?",
-    package.path
+    "/ccpgk/?.lua",
+    "/ccpgk/?",
+    "/ccpgk/global/vendor/?",
+    "/ccpgk/global/vendor/?.lua"
+    package.path,
 }
-package.path = table.concat(paths, ";") 
+package.path = table.concat(paths, ";")
+
+-- You can add your code below this comment
 ]=]
 
 local command = params[1]
