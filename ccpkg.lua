@@ -48,10 +48,12 @@ local function splitIntoNameAndVersion(package)
     return pkg
 end
 
+local function resolvePath(path)
+    if(isGlobal) then return globalPath.."/"..path else return shell.resolve(path) end
+end
+
 function ccpkg.parsePkgJson()
-    local path
-    if(isGlobal) then path = globalPath.."/pkg.json" else path = shell.resolve("pkg.json") end
-    local fh, err = io.open(path, "r")
+    local fh, err = io.open(resolvePath("pkg.json"), "r")
     if(err) then print(err) end
     local json = textutils.unserialiseJSON(fh:read())
     io.close(fh)
@@ -59,7 +61,7 @@ function ccpkg.parsePkgJson()
 end
 
 function ccpkg.updatePkgJson(pkg)
-    local fh, err = io.open(shell.resolve("pkg.json"), "w")
+    local fh, err = io.open(resolvePath("pkg.json"), "w")
     if(err) then print(err) end
     local json = textutils.serializeJSON(pkg)
     fh:write(json)

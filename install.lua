@@ -84,14 +84,17 @@ fs.delete(shell.dir().."/install.lua")
 
 print("Would you like to enable global packages? (y/n)")
 local answer
-while not answer and (answer ~= "y" or answer ~= "n") do
+while(answer ~= "y" and answer ~= "n") do
     answer = read()
-    if(answer = "y") then
+    if(answer == "y") then
+        local oldDir = shell.resolve(shell.dir())
         fs.makeDir(workingDir.."/global")
         shell.setDir(workingDir.."/global")
         shell.run("ccpkg", "new", "global")
+        fs.delete(shell.resolve("init.lua"))
+        shell.setDir(oldDir)
         print("Globals are now enabled")
-    elseif(answer = "n") then
+    elseif(answer == "n") then
         -- Do nothing
     else
         print("Please answer using either 'y' or 'n'")
