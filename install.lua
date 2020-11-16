@@ -83,7 +83,7 @@ fs.makeDir(workingDir.."/tmp")
 
 
 --createDefaultStartupFile() deprecated
-updatePath()
+--updatePath() -- deprecated
 downloadDependencies()
 print("Cleaning up")
 fs.delete(shell.dir().."/install.lua")
