@@ -44,7 +44,7 @@ local paths = {
     "/ccpgk/?.lua",
     "/ccpgk/?",
     "/ccpgk/global/vendor/?",
-    "/ccpgk/global/vendor/?.lua"
+    "/ccpgk/global/vendor/?.lua",
     package.path,
 }
 package.path = table.concat(paths, ";")
@@ -237,14 +237,17 @@ function ccpkg.add(package)
 end
 
 function ccpkg.remove(name)
+    local path
+    if(isGlobal) then path = globalPath.."/vendor/" else path = vendorPath.."/" end
     local pkg = ccpkg.parsePkgJson()
     local deps = pkg.dependencies
     if(not deps[name]) then
         print("You do not have "..name.." as a dependency") 
     else
+        local version = deps[name]
         deps[name] = nil
         ccpkg.updatePkgJson(pkg)
-        fs.delete(vendorPath.."/"..name)
+        fs.delete(path..name.."-"..version)
         print("Removed successfully")
     end
 end
