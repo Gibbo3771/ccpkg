@@ -168,15 +168,15 @@ function ccpkg.install(name, version, path)
     local path
     if(isGlobal) then path = globalPath.."/vendor/" else path = vendorPath.."/" end
     tar.extract(t, path)
-    local files = fs.list(path)
-    -- When downloaded from github the tar contains a version
-    -- folder, we remove the version number to allow
-    -- module references
-    for _, file in pairs(files) do
-       if(string.find(file, name, 1, true)) then
-            fs.move(path..file, path..name)
-        end
-    end
+--    local files = fs.list(path)
+--    -- When downloaded from github the tar contains a version
+--    -- folder, we remove the version number to allow
+--    -- module references
+--    for _, file in pairs(files) do
+--       if(string.find(file, name, 1, true)) then
+--            fs.move(path..file, path..name)
+--        end
+--    end
 end
 
 function ccpkg.add(package)    

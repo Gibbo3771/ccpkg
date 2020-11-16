@@ -9,7 +9,9 @@ local startupContent = [=[
 local paths = {
     package.path,
     "/ccpgk/?.lua",
-    "/ccpgk/?"
+    "/ccpgk/?",
+    "/ccpgk/global/vendor/?",
+    "/ccpgk/global/vendor/?.lua"
 }
 package.path = table.concat(paths, ";")
 shell.setPath(shell.path()..":".."/ccpkg/bin")  
@@ -22,6 +24,8 @@ local function updatePath()
         package.path,
         "/ccpgk/?.lua",
         "/ccpgk/?",
+        "/ccpgk/global/vendor/?",
+        "/ccpgk/global/vendor/?.lua"
     }
     package.path = table.concat(paths, ";")
     shell.setPath(shell.path()..":".."/ccpkg/bin") 
