@@ -82,7 +82,7 @@ fs.makeDir(workingDir.."/cache")
 fs.makeDir(workingDir.."/tmp")
 
 
-createDefaultStartupFile()
+--createDefaultStartupFile() deprecated
 updatePath()
 downloadDependencies()
 print("Cleaning up")
