@@ -114,9 +114,7 @@ Once you are happy, create a PR with your Formula. If you are keeping your packa
 
 Lots. There is some modification of `package.path` and what not, and I am not sure on the side effects or weirdness you will get with my implementation of the path resolution. I didn't realise `shell.resolve` was a thing!
 
-**IT WILL NUKE YOUR `/startup` FILE**. A custom startup file is required (kinda like a bashrc) to setup paths and what not. You can append to this one instead.
-
-My only package sucks. And there is no "global" installation, however this is going to be my next plan as I suspect majority of uses for this is to hold complete programs, rather than API/SDK stuff.
+My only package sucks.
 
 ## NOTE
 
