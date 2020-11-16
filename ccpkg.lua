@@ -57,6 +57,7 @@ local command = params[1]
 local path = shell.dir()
 local vendorPath = path.."/vendor"
 local cachePath = "/ccpkg/cache"
+local tmpPath = "/ccpkg/tmp"
 local globalPath = "/ccpkg/global"
 
 -- If global has been passed as the base command
@@ -200,7 +201,7 @@ function ccpkg.install(name, version, path)
     print("Extracting archive")
     local path
     if(isGlobal) then path = globalPath.."/vendor/" else path = vendorPath.."/" end
-    tar.extract(t, path)
+    tar.extract(t, tmpPath)
     local files = fs.list(path)
     -- When downloaded from github the tar contains a version
     -- folder, we remove the version number to allow

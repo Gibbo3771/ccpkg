@@ -79,6 +79,8 @@ end
 
 fs.makeDir(workingDir)
 fs.makeDir(workingDir.."/cache")
+fs.makeDir(workingDir.."/tmp")
+
 
 createDefaultStartupFile()
 updatePath()
