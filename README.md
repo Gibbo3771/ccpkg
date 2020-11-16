@@ -10,7 +10,7 @@ ccpkg will allow CC programmers to come together and share common code without h
 Download the installation script by pasting the following command into your computer:
 `wget https://raw.githubusercontent.com/Gibbo3771/ccpkg/main/install.lua`
 
-Once downloaded, run `install`. You are good to go :).
+Once downloaded, run `install`. When asked to enable **global** packages, say yes. You can read more about global packages below. You're then all set!
 
 ### Example
 
@@ -25,18 +25,16 @@ edit init
 Inside the `init` file, enter the following code below the existing code):
 
 ```lua
-local h = require("ccpkg-hello-world.init")
-h:run()
+local h = require("ccpkg-hello-world.hello")
+h:hello()
 ```
 Test it by running `init`.
 
 To add it to your startup, you can just require your project directly, like so:
 
 ```lua
--- in /startup
 require("example.init")
 ```
-
 
 
 ### Commands
@@ -49,6 +47,23 @@ Below is the list of commands you can run:
 `ccpkg remove <package-name>` - Remove a package
 
 That's pretty much it.
+
+### Global packages
+
+As well as installing packages locally on a per project basis, you can also
+install them **globally**. This is most useful when you want to include entire programs
+in all your projects, or if you simply want to install a program and run it from
+your start file without having to create a project using `new`.
+
+To use **global** packages, you can include the `global` sub command.
+
+Adding a package:
+
+`ccpkg add global <package-name>`
+
+Removing a package:
+
+`ccpkg remove global <package-name>`
 
 ### Formula
 
