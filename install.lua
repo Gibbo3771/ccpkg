@@ -21,7 +21,7 @@ local function updatePath()
     local paths = {
         package.path,
         "/ccpgk/?.lua",
-        "/ccpgk/?"
+        "/ccpgk/?",
     }
     package.path = table.concat(paths, ";")
     shell.setPath(shell.path()..":".."/ccpkg/bin") 
@@ -82,5 +82,20 @@ downloadDependencies()
 print("Cleaning up")
 fs.delete(shell.dir().."/install.lua")
 
-print("Successfully installed, you can run using the 'ccpkg' command") 
+print("Would you like to enable global packages? (y/n)")
+local answer
+while not answer and (answer ~= "y" or answer ~= "n") do
+    answer = read()
+    if(answer = "y") then
+        fs.makeDir(workingDir.."/global")
+        shell.setDir(workingDir.."/global")
+        shell.run("ccpkg", "new", "global")
+        print("Globals are now enabled")
+    elseif(answer = "n") then
+        -- Do nothing
+    else
+        print("Please answer using either 'y' or 'n'")
+    end
+end
+print("Successfully installed, you can run using the 'ccpkg' command")
 

@@ -22,6 +22,8 @@ local command = params[1]
 local path = shell.dir()
 local vendorPath = path.."/vendor"
 local cachePath = "/ccpkg/cache"
+local globalPath = "/ccpkg/global"
+
 -- If global has been passed as the base command
 local isGlobal = false
 
@@ -47,7 +49,9 @@ local function splitIntoNameAndVersion(package)
 end
 
 function ccpkg.parsePkgJson()
-    local fh, err = io.open(shell.resolve("pkg.json"), "r")
+    local path
+    if(isGlobal) then path = globalPath.."/pkg.json" else path = shell.resolve("pkg.json") end
+    local fh, err = io.open(path, "r")
     if(err) then print(err) end
     local json = textutils.unserialiseJSON(fh:read())
     io.close(fh)
