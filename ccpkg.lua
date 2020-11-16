@@ -201,16 +201,19 @@ function ccpkg.install(name, version, path)
     print("Extracting archive")
     local path
     if(isGlobal) then path = globalPath.."/vendor/" else path = vendorPath.."/" end
-    tar.extract(t, tmpPath)
-    local files = fs.list(path)
+    local tmp = tmpPath.."/"..name -- tmp directory just for this package download
+    fs.makeDir(tmp)
+    tar.extract(t, tmp)
+    local files = fs.list(tmp)
     -- When downloaded from github the tar contains a version
     -- folder, we remove the version number to allow
     -- module references
     for _, file in pairs(files) do
        if(string.find(file, name, 1, true)) then
-            fs.move(path..file, path..name)
+            fs.move(tmp.."/"..file, path..name)
         end
     end
+    fs.delete(tmp)
 end
 
 function ccpkg.add(package)    
@@ -248,7 +251,7 @@ function ccpkg.remove(name)
         local version = deps[name]
         deps[name] = nil
         ccpkg.updatePkgJson(pkg)
-        fs.delete(path..name.."-"..version)
+        fs.delete(path..name)
         print("Removed successfully")
     end
 end
