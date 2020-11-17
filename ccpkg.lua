@@ -52,6 +52,21 @@ package.path = table.concat(paths, ";")
 -- You can add your code below this comment
 ]=]
 
+local startupFileContents = [=[
+-- AUTO GENERATED DO NOT EDIT OR DELETE
+-- If you must modify the path, ensure you do not remove existing entries
+-- as this will break ccpkg module resolution
+local paths = {
+    "/#{path}/init.lua", -- Resolve the init file
+    "/#{path}/init",
+    package.path,
+}
+package.path = table.concat(paths, ";")
+
+-- Load your script on startup
+require("#{init}")
+]=]
+
 local command = params[1]
 
 local path = shell.dir()
@@ -185,6 +200,27 @@ function ccpkg.new(name)
     createEntryFile()
     local pkg = ccpkg.parsePkgJson()
     ccpkg.updatePkgJson(pkg)
+    print("Would you like to create a startup file for this project? (this will automatically start it on boot) (y/n)")
+    local answer
+    local startupFilename = "/startup/50_"..name.."-start.lua"
+    while(answer ~= "y" and answer ~= "n") do
+        answer = read()
+        if(answer == "y") then
+            local injected = startupFileContents:gsub("#{path}", shell.dir()):gsub("#{init}", shell.resolve("init.lua"):gsub("/", "."))
+            local fh, err = io.open(startupFilename, "w")
+            if(err) then
+                printError("Could not create startup file")
+                error(err) 
+            end
+            fh:write(injected)
+            io.close(fh)
+            print("Created startup file as "..startupFilename.." in /startup")
+        elseif(answer == "n") then
+            -- Do nothing
+        else
+            print("Please answer using either 'y' or 'n'")
+        end
+    end
 end
 
 -- Installs a package for a project

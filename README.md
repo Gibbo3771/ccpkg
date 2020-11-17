@@ -46,6 +46,8 @@ Below is the list of commands you can run:
 
 `ccpkg remove <package-name>` - Remove a package
 
+`ccpkg run <file>` - Runs a script using the ccpkg environment
+
 That's pretty much it.
 
 ### Global packages
