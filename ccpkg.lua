@@ -216,6 +216,8 @@ function ccpkg.install(name, version, path)
     fs.delete(tmp)
 end
 
+-- Adds a new package
+-- @param package the name and semantic version separate by an @, or just the name
 function ccpkg.add(package)    
     local name, version = unpack(splitIntoNameAndVersion(package))
     local formula = ccpkg.getFormula(name)
@@ -240,6 +242,8 @@ function ccpkg.add(package)
     print(name.." has been added to your project as a dependency")
 end
 
+-- Adds a new package
+-- @param name the name of the package
 function ccpkg.remove(name)
     local path
     if(isGlobal) then path = globalPath.."/vendor/" else path = vendorPath.."/" end
@@ -256,10 +260,33 @@ function ccpkg.remove(name)
     end
 end
 
+-- Runs a local file using ccpkg. This handles setting `package.path` so that
+-- ccpkg can resolve packages in the local project, or in the global
 function ccpkg.run()
-    shell.run("/"..shell.resolve("init.lua"))
+    table.remove(params, 1) -- 'run' arg
+    local program = params[1]
+    table.remove(params, 1) -- program name
+    local paths
+        paths = {
+            "/"..shell.dir().."/vendor/?.lua", -- Always resolve local modules first
+            "/"..shell.dir().."/vendor/?",
+            "/ccpkg/?.lua",
+            "/ccpkg/?",
+            "/ccpkg/global/vendor/?",
+            "/ccpkg/global/vendor/?.lua",
+            package.path,
+        }
+    package.path = table.concat(paths, ";")
+    local programPath
+    if(fs.exists(shell.resolve(program))) then
+        programPath = "/"..shell.resolve(program)
+    elseif(fs.exists(shell.resolve(program..".lua"))) then
+        programPath = "/"..shell.resolve(program)..".lua"
+    else
+        error("Could not find "..program..". Are you in the correct directory?")
+    end
+    os.run(_ENV, programPath, (unpack(params)))
 end
-
 
 if(command == "new") then
     local name = params[2] or nil
@@ -309,10 +336,6 @@ elseif(command == "remove") then
     ccpkg.remove(package)
     return
 elseif(command == "run") then
-    if(not isProjectFolder()) then
-        printError("Not in a project directory, run 'ccpkg new <project-name>' before trying to add packages")
-        return
-    end
     ccpkg.run()
     return
 end
