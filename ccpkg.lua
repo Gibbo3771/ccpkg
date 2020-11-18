@@ -161,13 +161,18 @@ end
 function ccpkg.download(url, version, name)
     print("Downloading package '"..name.."'...")
     local path = cachePath.."/"..name.."-"..version
-    local req = http.get(url, nil, true)
+    local h, err, res = http.get(url, nil, true)
+    if(not h) then
+        print("Error downloading "..name)
+        print("Error: "..err..". ".."HTTP Code: "...res.getResponseCode())
+        error("Failed to download, exiting")
+    end
     local fh, err = io.open(path..".tar.gz", "wb")
     if(err) then
         printError("Could not create entry file")
         error(err) 
     end
-    fh:write(req.readAll())
+    fh:write(h.readAll())
     io.close(fh)
 end
 
@@ -266,9 +271,9 @@ function ccpkg.add(package)
             if(version == "stable") then
                 version = f.stable()
             end
-            ccpkg.addToPkgJson(name, version)
             ccpkg.download(f.versions[version], version, name)
             ccpkg.install(name, version, cachePath.."/"..name.."-"..version)
+            ccpkg.addToPkgJson(name, version) -- Do last to save rollback
         else
             error("Could not execute formula")
         end
