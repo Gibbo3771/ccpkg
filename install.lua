@@ -79,7 +79,7 @@ while(answer ~= "y" and answer ~= "n") do
         local oldDir = shell.resolve(shell.dir())
         fs.makeDir(workingDir.."/global")
         shell.setDir(workingDir.."/global")
-        shell.run("ccpkg", "new", "global")
+        shell.run("ccpkg", "new", "global", "--no-startup")
         fs.delete(shell.resolve("init.lua"))
         shell.setDir(oldDir)
         print("Globals are now enabled")

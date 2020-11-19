@@ -77,6 +77,7 @@ local globalPath = "/ccpkg/global"
 
 -- If global has been passed as the base command
 local isGlobal = false
+local noStartup = false
 
 local function isProjectFolder()
     return fs.exists(path.."/pkg.json")
@@ -164,7 +165,7 @@ function ccpkg.download(url, version, name)
     local h, err, res = http.get(url, nil, true)
     if(not h) then
         print("Error downloading "..name)
-        print("Error: "..err..". ".."HTTP Code: "...res.getResponseCode())
+        print("Error: "..err..". ".."HTTP Code: "..res.getResponseCode())
         error("Failed to download, exiting")
     end
     local fh, err = io.open(path..".tar.gz", "wb")
@@ -205,25 +206,27 @@ function ccpkg.new(name)
     createEntryFile()
     local pkg = ccpkg.parsePkgJson()
     ccpkg.updatePkgJson(pkg)
-    print("Would you like to create a startup file for this project? (this will automatically start it on boot) (y/n)")
-    local answer
-    local startupFilename = "/startup/50_"..name.."-start.lua"
-    while(answer ~= "y" and answer ~= "n") do
-        answer = read()
-        if(answer == "y") then
-            local injected = startupFileContents:gsub("#{path}", shell.dir()):gsub("#{init}", shell.resolve("init.lua"):gsub("/", "."))
-            local fh, err = io.open(startupFilename, "w")
-            if(err) then
-                printError("Could not create startup file")
-                error(err) 
+    if(not noStartup) then
+        print("Would you like to create a startup file for this project? (this will automatically start it on boot) (y/n)")
+        local answer
+        local startupFilename = "/startup/50_"..name.."-start.lua"
+        while(answer ~= "y" and answer ~= "n") do
+            answer = read()
+            if(answer == "y") then
+                local injected = startupFileContents:gsub("#{path}", shell.dir()):gsub("#{init}", shell.resolve("init.lua"):gsub("/", "."))
+                local fh, err = io.open(startupFilename, "w")
+                if(err) then
+                    printError("Could not create startup file")
+                    error(err) 
+                end
+                fh:write(injected)
+                io.close(fh)
+                print("Created startup file as "..startupFilename.." in /startup")
+            elseif(answer == "n") then
+                -- Do nothing
+            else
+                print("Please answer using either 'y' or 'n'")
             end
-            fh:write(injected)
-            io.close(fh)
-            print("Created startup file as "..startupFilename.." in /startup")
-        elseif(answer == "n") then
-            -- Do nothing
-        else
-            print("Please answer using either 'y' or 'n'")
         end
     end
 end
@@ -338,6 +341,10 @@ if(command == "new") then
     if(isProjectFolder()) then
         printError("A project has already been created in this directory")
         return
+    end
+    local flag = params[3] or nil
+    for _, flag in ipairs(params) do
+        if(flag == "--no-startup") then noStartup = true end
     end
     ccpkg.new(name)
     print("Finished, happy coding!")
