@@ -5,10 +5,43 @@ An early work in progress for a lua package manager specifically for Computer Cr
 
 ccpkg will allow CC programmers to come together and share common code without having the problems associated with pastebin. Manage each version through the central "repository" (lives [here](https://github.com/Gibbo3771/ccpkg/tree/main/formula)) using lua scripts, add, remove and update packages on the fly.
 
-### Installation
+&nbsp;
+
+
+## Features
+Features are being put in quite frequently, so far we support the following operations:
+
+* Add and remove packages from formula definitions
+* Local and global dependencies
+* Package versioning (no auto diffing)
+* Create projects for locally scoped dependencies
+* Priority dependency resolution (checks local before global)
+* Startup configuration to autoload paths, with optional bootstrapped startup file per project
+* Built in `run` command to execute non project scripts with ccpkg module resolution
+* Package caching
+* Colored output and extensive logging
+
+&nbsp;
+
+
+## Planned features
+
+There is quite a few things missing that I want to get around to doing.
+
+* Pre and Post installation hooks
+* Resolve dependencies of dependencies if they are ccpkg projects
+* .gitignore tempate
+* "binary" installation method to allow execution of entire programs (think entire turtle programs)
+* Additional fields in formula such as liscence, email, contributors etc
+* Master list maintained via CI
+* Query said master list to provide autocomplete functions 
+
+&nbsp;
+
+## Installation
 
 Download the installation script by pasting the following command into your computer:
-`wget https://raw.githubusercontent.com/Gibbo3771/ccpkg/main/install.lua`
+`wget run https://raw.githubusercontent.com/Gibbo3771/ccpkg/main/install.lua`
 
 Once downloaded, run `install`. When asked to enable **global** packages, say yes. You can read more about global packages below. You're then all set!
 
@@ -36,6 +69,8 @@ To add it to your startup, you can just require your project directly, like so:
 require("example.init")
 ```
 
+&nbsp;
+
 
 ### Commands
 Below is the list of commands you can run:
@@ -48,7 +83,12 @@ Below is the list of commands you can run:
 
 `ccpkg run <file>` - Runs a script using the ccpkg environment
 
+`ccpkg install` - Installs all the dependencies specified in the `pkg.json`
+
 That's pretty much it.
+
+&nbsp;
+
 
 ### Global packages
 
@@ -66,6 +106,9 @@ Adding a package:
 Removing a package:
 
 `ccpkg remove global <package-name>`
+
+&nbsp;
+
 
 ### Formula
 
@@ -100,6 +143,9 @@ end
 return helloWorld -- [REQUIRED] Return it so ccpkg can compile and run it
 ```
 
+&nbsp;
+
+
 ### Creating a Formula
 
 First off, fork this repository. Direct commits are not permitted.
@@ -112,11 +158,17 @@ Follow the above anatomy to create your formula properly. Here are criteria each
 
 Once you are happy, create a PR with your Formula. If you are keeping your packages up to date and are active, you will be given the ability to merge your own PR.
 
+&nbsp;
+
+
 ### Caveats
 
 Lots. There is some modification of `package.path` and what not, and I am not sure on the side effects or weirdness you will get with my implementation of the path resolution. I didn't realise `shell.resolve` was a thing!
 
 My only package sucks.
+
+&nbsp;
+
 
 ## NOTE
 
