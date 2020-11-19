@@ -70,10 +70,10 @@ require("#{init}")
 local command = params[1]
 
 local path = shell.dir()
-local vendorPath = path.."/vendor"
-local cachePath = "/ccpkg/cache"
-local tmpPath = "/ccpkg/tmp"
-local globalPath = "/ccpkg/global"
+local vendorPath = path.."/vendor/"
+local cachePath = "/ccpkg/cache/"
+local tmpPath = "/ccpkg/tmp/"
+local globalPath = "/ccpkg/global/"
 
 -- If global has been passed as the base command
 local isGlobal = false
@@ -100,7 +100,18 @@ local function splitIntoNameAndVersion(package)
 end
 
 local function resolvePath(path)
-    if(isGlobal) then return globalPath.."/"..path else return shell.resolve(path) end
+    if(isGlobal) then return globalPath..path else return shell.resolve(path) end
+end
+
+local function retrieveFromCache(name)
+    local list = fs.list(cachePath)
+    for _, sFileName in pairs(list) do
+        local sCutName = fs.getName(sFileName)
+        print(sCutName:match("(.+)%-.+"))
+        if sCutName:match("(.+)%-.+") == name then
+            return sFileName
+        end
+    end
 end
 
 function ccpkg.parsePkgJson()
@@ -127,7 +138,7 @@ function ccpkg.addToPkgJson(name, version)
     local pkg = ccpkg.parsePkgJson()
     if(pkg.dependencies[name]) then
         if(pkg.dependencies[name] ~= version) then
-            print("You already have this package installed as a different version")
+            print("You already have this package installed as version '"..version.."'")
         else
             if(isGlobal) then
                 print("You already have "..name.."@"..version.." installed globally")
@@ -145,6 +156,7 @@ end
 
 -- Downloads a formula from the main repository
 -- @param name the name of the formula
+-- @returns the compiled formula
 function ccpkg.getFormula(name)
     print("Looking for formula '"..name.."'...")
     local req = http.get("https://raw.githubusercontent.com/Gibbo3771/ccpkg/main/formula/"..name..".lua")
@@ -152,7 +164,21 @@ function ccpkg.getFormula(name)
         error("Could not download formula") 
     end
     print("Found '"..name.."'")
-    return req.readAll()
+    local func, err = load(req.readAll())
+    if func then
+        local ok, f = pcall(func)
+        if ok then
+            return f
+        else
+            error("Could not execute formula")
+        end
+    else
+        error("Could not compile formula")
+    end
+end
+
+function ccpkg.compileFormula()
+
 end
 
 -- download the tar.gz from the github release
@@ -161,7 +187,7 @@ end
 -- @param name the name of the package
 function ccpkg.download(url, version, name)
     print("Downloading package '"..name.."'...")
-    local path = cachePath.."/"..name.."-"..version
+    local path = cachePath..name.."-"..version
     local h, err, res = http.get(url, nil, true)
     if(not h) then
         print("Error downloading "..name)
@@ -231,21 +257,20 @@ function ccpkg.new(name)
     end
 end
 
--- Installs a package for a project
+-- Includes the specified package in the project
 -- @param name the name of the package
 -- @param version the version
 -- @param name the name of the package
--- @param path the location of the package artifacts
-function ccpkg.install(name, version, path)
+function ccpkg.include(name, version)
+    local destination
+    if(isGlobal) then destination = globalPath.."/vendor/" else destination = vendorPath end
     local tar = require("tar")
     print("Installing")
     print("Decompressing archive..")
-    local t = tar.decompress(path..".tar.gz")
+    local t = tar.decompress(cachePath..name.."-"..version..".tar.gz")
     t = tar.load(t, false, true)
     print("Extracting archive")
-    local path
-    if(isGlobal) then path = globalPath.."/vendor/" else path = vendorPath.."/" end
-    local tmp = tmpPath.."/"..name -- tmp directory just for this package download
+    local tmp = tmpPath..name -- tmp directory just for this package download
     fs.makeDir(tmp)
     tar.extract(t, tmp)
     local files = fs.list(tmp)
@@ -254,7 +279,7 @@ function ccpkg.install(name, version, path)
     -- module references
     for _, file in pairs(files) do
        if(string.find(file, name, 1, true)) then
-            fs.move(tmp.."/"..file, path..name)
+            fs.move(tmp.."/"..file, destination..name)
         end
     end
     fs.delete(tmp)
@@ -265,24 +290,19 @@ end
 function ccpkg.add(package)    
     local name, version = unpack(splitIntoNameAndVersion(package))
     local formula = ccpkg.getFormula(name)
-    local func, err = load(formula)
-    if func then
-        local ok, f = pcall(func)
-        if ok then
-            -- If no version is passed, we set it to resolve
-            -- to whatever version the formula specifies as "stable"
-            if(version == "stable") then
-                version = f.stable()
-            end
-            ccpkg.download(f.versions[version], version, name)
-            ccpkg.install(name, version, cachePath.."/"..name.."-"..version)
-            ccpkg.addToPkgJson(name, version) -- Do last to save rollback
-        else
-            error("Could not execute formula")
-        end
-    else
-        error("Could not compile formula")
+    -- If no version is passed, we set it to resolve
+    -- to whatever version the formula specifies as "stable"
+    if(version == "stable") then
+        version = formula.stable()
     end
+    local file = retrieveFromCache(name)
+    if(not file) then
+        ccpkg.download(formula.versions[version], version, name)
+    else
+        print("Installing "..name.." from cache")
+    end
+    ccpkg.addToPkgJson(name, version)
+    ccpkg.include(name, version)
     print(name.." has been added to your project as a dependency")
 end
 
@@ -290,7 +310,7 @@ end
 -- @param name the name of the package
 function ccpkg.remove(name)
     local path
-    if(isGlobal) then path = globalPath.."/vendor/" else path = vendorPath.."/" end
+    if(isGlobal) then path = globalPath.."/vendor/" else path = vendorPath end
     local pkg = ccpkg.parsePkgJson()
     local deps = pkg.dependencies
     if(not deps[name]) then
@@ -302,6 +322,28 @@ function ccpkg.remove(name)
         fs.delete(path..name)
         print("Removed successfully")
     end
+end
+
+-- Installs all the dependencies specified in the pkg.json
+function ccpkg.installFromPkg()
+    print("Installing dependencies...")
+    local pkg = ccpkg.parsePkgJson()
+    local noop = true
+    for name, version in pairs(pkg.dependencies) do
+        if(not fs.exists(vendorPath..name)) then 
+            noop = false
+            local file = retrieveFromCache(name)
+            if(not file) then
+                local formula = ccpkg.getFormula(name)
+                ccpkg.download(formula.versions[version], version, name)
+                ccpkg.include(name, version)
+            else
+                print("Installing "..name.." from cache")
+                ccpkg.include(name, version)
+            end
+        end
+    end
+    if(noop) then print("Up to date!") end
 end
 
 -- Runs a local file using ccpkg. This handles setting `package.path` so that
@@ -382,6 +424,9 @@ elseif(command == "remove") then
         return
     end
     ccpkg.remove(package)
+    return
+elseif(command == "install") then
+    ccpkg.installFromPkg()
     return
 elseif(command == "run") then
     ccpkg.run()
