@@ -78,6 +78,18 @@ local globalPath = "/ccpkg/global/"
 -- If global has been passed as the base command
 local isGlobal = false
 local noStartup = false
+local color = term.isColor();
+
+local function log(color, message)
+    if(color) then
+        local oc = term.getTextColor()
+        term.setTextColor(color)
+        print(message)
+        term.setTextColor(oc)
+    else
+        print(message)
+    end
+end
 
 local function isProjectFolder()
     return fs.exists(path.."/pkg.json")
@@ -107,7 +119,6 @@ local function retrieveFromCache(name)
     local list = fs.list(cachePath)
     for _, sFileName in pairs(list) do
         local sCutName = fs.getName(sFileName)
-        print(sCutName:match("(.+)%-.+"))
         if sCutName:match("(.+)%-.+") == name then
             return sFileName
         end
@@ -116,7 +127,7 @@ end
 
 function ccpkg.parsePkgJson()
     local fh, err = io.open(resolvePath("pkg.json"), "r")
-    if(err) then print(err) end
+    if(err) then error(err) end
     local json = textutils.unserialiseJSON(fh:read())
     io.close(fh)
     return json
@@ -124,7 +135,7 @@ end
 
 function ccpkg.updatePkgJson(pkg)
     local fh, err = io.open(resolvePath("pkg.json"), "w")
-    if(err) then print(err) end
+    if(err) then error(err) end
     local json = textutils.serializeJSON(pkg)
     fh:write(json)
     io.close(fh)
@@ -138,12 +149,12 @@ function ccpkg.addToPkgJson(name, version)
     local pkg = ccpkg.parsePkgJson()
     if(pkg.dependencies[name]) then
         if(pkg.dependencies[name] ~= version) then
-            print("You already have this package installed as version '"..version.."'")
+            log(colors.orange, "You already have this package installed as version '"..version.."'")
         else
             if(isGlobal) then
-                print("You already have "..name.."@"..version.." installed globally")
+                log(colors.orange, "You already have "..name.."@"..version.." installed globally")
             else
-                print("You already have "..name.."@"..version.." as a dependency")
+                log(colors.orange, "You already have "..name.."@"..version.." as a dependency")
             end
         end
         -- TODO graceful failures
@@ -158,12 +169,12 @@ end
 -- @param name the name of the formula
 -- @returns the compiled formula
 function ccpkg.getFormula(name)
-    print("Looking for formula '"..name.."'...")
+    log(colors.white, "Looking for formula '"..name.."'...")
     local req = http.get("https://raw.githubusercontent.com/Gibbo3771/ccpkg/main/formula/"..name..".lua")
     if(not req) then
         error("Could not download formula") 
     end
-    print("Found '"..name.."'")
+    log(colors.lime, "Found '"..name.."'")
     local func, err = load(req.readAll())
     if func then
         local ok, f = pcall(func)
@@ -177,21 +188,17 @@ function ccpkg.getFormula(name)
     end
 end
 
-function ccpkg.compileFormula()
-
-end
-
 -- download the tar.gz from the github release
 -- @param url the download url
 -- @param versionthe version being downloaded
 -- @param name the name of the package
 function ccpkg.download(url, version, name)
-    print("Downloading package '"..name.."'...")
+    log(colors.white, "Downloading package '"..name.."'...")
     local path = cachePath..name.."-"..version
     local h, err, res = http.get(url, nil, true)
     if(not h) then
-        print("Error downloading "..name)
-        print("Error: "..err..". ".."HTTP Code: "..res.getResponseCode())
+        log(colors.red, "Error downloading "..name)
+        log(colors.red, "Error: "..err..". ".."HTTP Code: "..res.getResponseCode())
         error("Failed to download, exiting")
     end
     local fh, err = io.open(path..".tar.gz", "wb")
@@ -227,13 +234,13 @@ function ccpkg.new(name)
         io.close(fh)
     end
     
-    print("Creating new project '"..name.."'")
+    log(colors.white, "Creating new project '"..name.."'")
     createPackageFile()
     createEntryFile()
     local pkg = ccpkg.parsePkgJson()
     ccpkg.updatePkgJson(pkg)
     if(not noStartup) then
-        print("Would you like to create a startup file for this project? (this will automatically start it on boot) (y/n)")
+        log(colors.cyan, "Would you like to create a startup file for this project? (this will automatically start it on boot) (y/n)")
         local answer
         local startupFilename = "/startup/50_"..name.."-start.lua"
         while(answer ~= "y" and answer ~= "n") do
@@ -247,11 +254,11 @@ function ccpkg.new(name)
                 end
                 fh:write(injected)
                 io.close(fh)
-                print("Created startup file as "..startupFilename.." in /startup")
+                log(colors.lime, "Created startup file as "..startupFilename.." in /startup")
             elseif(answer == "n") then
                 -- Do nothing
             else
-                print("Please answer using either 'y' or 'n'")
+                log(colors.red, "Please answer using either 'y' or 'n'")
             end
         end
     end
@@ -265,11 +272,11 @@ function ccpkg.include(name, version)
     local destination
     if(isGlobal) then destination = globalPath.."/vendor/" else destination = vendorPath end
     local tar = require("tar")
-    print("Installing")
-    print("Decompressing archive..")
+    log(colors.white, "Installing")
+    log(colors.white, "Decompressing archive..")
     local t = tar.decompress(cachePath..name.."-"..version..".tar.gz")
     t = tar.load(t, false, true)
-    print("Extracting archive")
+    log(colors.white, "Extracting archive")
     local tmp = tmpPath..name -- tmp directory just for this package download
     fs.makeDir(tmp)
     tar.extract(t, tmp)
@@ -299,11 +306,15 @@ function ccpkg.add(package)
     if(not file) then
         ccpkg.download(formula.versions[version], version, name)
     else
-        print("Installing "..name.." from cache")
+        log(colors.white, "Installing "..name.." from cache")
     end
     ccpkg.addToPkgJson(name, version)
     ccpkg.include(name, version)
-    print(name.." has been added to your project as a dependency")
+    if(not isGlobal) then 
+        log(colors.green, name.." has been added to your project as a dependency") 
+    else 
+        log(colors.green, name.." has been added globally") 
+    end
 end
 
 -- Adds a new package
@@ -314,19 +325,19 @@ function ccpkg.remove(name)
     local pkg = ccpkg.parsePkgJson()
     local deps = pkg.dependencies
     if(not deps[name]) then
-        print("You do not have "..name.." as a dependency") 
+        log(colors.orange, "You do not have "..name.." as a dependency") 
     else
         local version = deps[name]
         deps[name] = nil
         ccpkg.updatePkgJson(pkg)
         fs.delete(path..name)
-        print("Removed successfully")
+        log(colors.lime, "Removed "..name.." successfully")
     end
 end
 
 -- Installs all the dependencies specified in the pkg.json
 function ccpkg.installFromPkg()
-    print("Installing dependencies...")
+    log(colors.white, "Installing dependencies...")
     local pkg = ccpkg.parsePkgJson()
     local noop = true
     for name, version in pairs(pkg.dependencies) do
@@ -338,12 +349,12 @@ function ccpkg.installFromPkg()
                 ccpkg.download(formula.versions[version], version, name)
                 ccpkg.include(name, version)
             else
-                print("Installing "..name.." from cache")
+                log(colors.white, "Installing "..name.." from cache")
                 ccpkg.include(name, version)
             end
         end
     end
-    if(noop) then print("Up to date!") end
+    if(noop) then log(colors.limed, "Up to date!") end
 end
 
 -- Runs a local file using ccpkg. This handles setting `package.path` so that
@@ -389,7 +400,7 @@ if(command == "new") then
         if(flag == "--no-startup") then noStartup = true end
     end
     ccpkg.new(name)
-    print("Finished, happy coding!")
+    log(colors.lime, "Finished, happy coding!")
     return
 elseif(command == "add") then
     local sub = params[2] or nil  -- subcommand
@@ -433,4 +444,4 @@ elseif(command == "run") then
     return
 end
 
-print("Unrecongized command "..command)
+log(colors.red, "Unrecongized command "..command)
