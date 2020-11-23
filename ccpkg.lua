@@ -91,6 +91,8 @@ local function log(color, message)
     end
 end
 
+-- Check if the current folder is a valid project directory
+-- @returns
 local function isProjectFolder()
     return fs.exists(path.."/pkg.json")
 end
@@ -111,10 +113,17 @@ local function splitIntoNameAndVersion(package)
     return pkg
 end
 
+-- A helper that resolves the project path depending on the 
+-- global flag
+-- @param path the path to resolve
 local function resolvePath(path)
     if(isGlobal) then return globalPath..path else return shell.resolve(path) end
 end
 
+-- Iterates over all the files present in the cache and attempts
+-- the find one with the name provided using the format pattern.
+-- @param name the name of the package
+-- @returns the full filename of the package if it exissts in the cache
 local function retrieveFromCache(name)
     local list = fs.list(cachePath)
     for _, sFileName in pairs(list) do
@@ -125,6 +134,8 @@ local function retrieveFromCache(name)
     end
 end
 
+-- Parses the pkg.json file
+-- @returns a table representation of the file
 function ccpkg.parsePkgJson()
     local fh, err = io.open(resolvePath("pkg.json"), "r")
     if(err) then error(err) end
@@ -133,6 +144,9 @@ function ccpkg.parsePkgJson()
     return json
 end
 
+-- Updates the pkg.json file on file. This is a complete replacement.
+-- @param pkg the contents to put into the file
+-- @returns the updated file in json format
 function ccpkg.updatePkgJson(pkg)
     local fh, err = io.open(resolvePath("pkg.json"), "w")
     if(err) then error(err) end
@@ -210,6 +224,15 @@ function ccpkg.download(url, version, name)
     io.close(fh)
 end
 
+
+-- Creates a new project.
+-- This will create a new project in the current directory, it will generate a pkg.json, a vendor folder
+-- and an init.lua entry file.
+-- The user will be prompted if they would like to create a startup file for the project, enableing autorun
+-- when the machine comes online. If the --no-startup flag is passed to ccpkg when creating a new project, this 
+-- question will be skipped.
+-- @param name the name of the project, this will fill in the 'name' field in the pkg.json
+-- @throws if it can not create a pkg.json file, or an init.lua entry file, or if it can't create a startup file
 function ccpkg.new(name)
     function createPackageFile()
         local defaultPkgFile = {version = "1.0.0", name = name, dependencies = {}}
@@ -242,7 +265,7 @@ function ccpkg.new(name)
     if(not noStartup) then
         log(colors.cyan, "Would you like to create a startup file for this project? (this will automatically start it on boot) (y/n)")
         local answer
-        local startupFilename = "/startup/50_"..name.."-start.lua"
+        local startupFilename = "/startup/90_"..name.."-start.lua"
         while(answer ~= "y" and answer ~= "n") do
             answer = read()
             if(answer == "y") then
@@ -264,15 +287,13 @@ function ccpkg.new(name)
     end
 end
 
--- Includes the specified package in the project
+-- Extracts a .tar.gz archived package
 -- @param name the name of the package
--- @param version the version
--- @param name the name of the package
-function ccpkg.include(name, version)
-    local destination
-    if(isGlobal) then destination = globalPath.."/vendor/" else destination = vendorPath end
+-- @param version the version of the package
+-- @returns the path to the extracted archives
+function ccpkg.extractTar(name, version)
     local tar = require("tar")
-    log(colors.white, "Installing")
+    local tar = require("tar")
     log(colors.white, "Decompressing archive..")
     local t = tar.decompress(cachePath..name.."-"..version..".tar.gz")
     t = tar.load(t, false, true)
@@ -280,21 +301,33 @@ function ccpkg.include(name, version)
     local tmp = tmpPath..name -- tmp directory just for this package download
     fs.makeDir(tmp)
     tar.extract(t, tmp)
-    local files = fs.list(tmp)
+    return tmp
+end
+
+-- Includes the specified package in the project
+-- @param artifacts the path to the package artifacts
+-- @param name the name of the package
+-- @param version the version of the package
+function ccpkg.include(artifacts, name, version)
+    local destination
+    if(isGlobal) then destination = globalPath.."/vendor/" else destination = vendorPath end
+    
+    local files = fs.list(artifacts)
     -- When downloaded from github the tar contains a version
     -- folder, we remove the version number to allow
     -- module references
     for _, file in pairs(files) do
        if(string.find(file, name, 1, true)) then
-            fs.move(tmp.."/"..file, destination..name)
+            fs.move(artifacts.."/"..file, destination..name)
         end
     end
-    fs.delete(tmp)
+    fs.delete(artifacts)
 end
 
 -- Adds a new package
 -- @param package the name and semantic version separate by an @, or just the name
-function ccpkg.add(package)    
+-- @param skipPkgUpdate if passed as true, updating the pkg json will be skipped
+function ccpkg.add(package, skipPkgUpdate)    
     local name, version = unpack(splitIntoNameAndVersion(package))
     local formula = ccpkg.getFormula(name)
     -- If no version is passed, we set it to resolve
@@ -308,16 +341,26 @@ function ccpkg.add(package)
     else
         log(colors.white, "Installing "..name.." from cache")
     end
-    ccpkg.addToPkgJson(name, version)
-    ccpkg.include(name, version)
-    if(not isGlobal) then 
-        log(colors.green, name.." has been added to your project as a dependency") 
-    else 
-        log(colors.green, name.." has been added globally") 
+    
+    local artifacts = ccpkg.extractTar(name, version)
+    -- If the formula specifies an install function, we let that run instead
+    if(formula.install) then
+        formula.install(ccpkg, artifacts, version)
+    else
+        ccpkg.include(artifacts, name, version)
+    end
+    
+    if(not skipPkgUpdate) then 
+        ccpkg.addToPkgJson(name, version) 
+        if(not isGlobal) then 
+            log(colors.green, name.." has been added to your project as a dependency") 
+        else 
+            log(colors.green, name.." has been added globally") 
+        end
     end
 end
 
--- Adds a new package
+-- Removes an existing package as a dependency
 -- @param name the name of the package
 function ccpkg.remove(name)
     local path
@@ -337,21 +380,13 @@ end
 
 -- Installs all the dependencies specified in the pkg.json
 function ccpkg.installFromPkg()
-    log(colors.white, "Installing dependencies...")
+    log(colors.white, "Installing dependencies")
     local pkg = ccpkg.parsePkgJson()
     local noop = true
     for name, version in pairs(pkg.dependencies) do
         if(not fs.exists(vendorPath..name)) then 
             noop = false
-            local file = retrieveFromCache(name)
-            if(not file) then
-                local formula = ccpkg.getFormula(name)
-                ccpkg.download(formula.versions[version], version, name)
-                ccpkg.include(name, version)
-            else
-                log(colors.white, "Installing "..name.." from cache")
-                ccpkg.include(name, version)
-            end
+            ccpkg.add(name.."@"..version, true)
         end
     end
     if(noop) then log(colors.limed, "Up to date!") end
