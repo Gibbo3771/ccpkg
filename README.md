@@ -64,12 +64,6 @@ h:hello()
 
 Test it by running `init`.
 
-To add it to your startup, you can just require your project directly, like so:
-
-```lua
-require("example.init")
-```
-
 &nbsp;
 
 
