@@ -1,4 +1,4 @@
-local package = {
+local package = { -- [REQUIRED] The table that ccpkg will require when it downloads the formula and compiles it
     name = "ccpkg-hello-world", -- [REQUIRED] The name of the package
     description = "This is an example formula", -- [REQUIRED] The description of the package
     homepage = "https://github.com/Gibbo3771/ccpkg-hello-world", -- [OPTIONAL] The homepage for the package
@@ -20,7 +20,6 @@ function package:postInstall(version)  -- [OPTIONAL] A post install hook
     -- Do some stuff
 end
 
--- TODO
 -- This hook is called during the installation of the package, if it
 -- exists on the formula, this will be ran instead of ccpkg install
 -- code, allowing custom installations

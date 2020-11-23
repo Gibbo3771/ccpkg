@@ -43,11 +43,11 @@ There is quite a few things missing that I want to get around to doing.
 Download the installation script by pasting the following command into your computer:
 `wget run https://raw.githubusercontent.com/Gibbo3771/ccpkg/main/install.lua`
 
-Once downloaded, run `install`. When asked to enable **global** packages, say yes. You can read more about global packages below. You're then all set!
+When asked to enable **global** packages, say yes. You can read more about global packages below. You're then all set!
 
 ### Example
 
-You can see an example by creating a new project by running the following commands:
+You can see an example by following the commands below:
 ```
 mkdir example
 cd example
@@ -61,6 +61,7 @@ Inside the `init` file, enter the following code below the existing code):
 local h = require("ccpkg-hello-world.hello")
 h:hello()
 ```
+
 Test it by running `init`.
 
 To add it to your startup, you can just require your project directly, like so:
@@ -112,35 +113,47 @@ Removing a package:
 
 ### Formula
 
-The anatomy of a Formula file, comments explain each section
+The anatomy of a Formula file, comments explain each section. This formula has been taken from the `ccpkh-hello-world` formula:
 
 ```lua
-local helloWorld = { -- [REQUIRED] Specify your formula as a table
-    name = "ccpkg-hello-world", -- [REQUIRED] The name of your package, this should match your filename
-    description = "This is an example formula",  -- The description of your package
-    versions = { --[REQUIRED] A list of versions, each key is the version number and the value is the url to the tarbal
+local package = { -- [REQUIRED] The table that ccpkg will require when it downloads the formula and compiles it
+    name = "ccpkg-hello-world", -- [REQUIRED] The name of the package
+    description = "This is an example formula", -- [REQUIRED] The description of the package
+    homepage = "https://github.com/Gibbo3771/ccpkg-hello-world", -- [OPTIONAL] The homepage for the package
+    repository = "https://github.com/Gibbo3771/ccpkg-hello-world", -- [OPTIONAL] The repository for the package
+    authors = { "Stephen Gibson" } -- [OPTIONAL] An array of authors for this package
+    versions = { -- [REQUIRED] A table of the available versions, where the key is the version number and the value is the download url
         ["2.0.0"] = "https://github.com/Gibbo3771/ccpkg-hello-world/archive/2.0.0.tar.gz",
         ["1.0.0"] = "https://github.com/Gibbo3771/ccpkg-hello-world/archive/1.0.0.tar.gz"
     }
 }
 
-function helloWorld:stable() -- [REQUIRED] Species the stable version of your package
+function package:stable() -- [REQUIRED] Specifies the "stable" version of the package
    return "2.0.0"
 end
 
--- NOT IMPLEMENTED
+-- TODO
 -- This hook is called right after the package has been installed
-function helloWorld:postInstall(version)
+function package:postInstall(version)  -- [OPTIONAL] A post install hook
     -- Do some stuff
 end
 
--- NOT IMPLEMENTED
+-- This hook is called during the installation of the package, if it
+-- exists on the formula, this will be ran instead of ccpkg install
+-- code, allowing custom installations
+function package:install(ccpkg, artifacts, version)  -- [OPTIONAL] An installation hook. Allows custom logic for installation
+    -- As an example, we don't actually do anything custom, we just include
+    -- the package as normal
+    ccpkg.include(artifacts, self.name, version)
+end
+
+-- TODO
 -- This hook is called right before the package is installed
-function helloWorld:preInstall(version)
+function package:preInstall(version)  -- [OPTIONAL] A pre install hook
     -- Do some stuff
 end
 
-return helloWorld -- [REQUIRED] Return it so ccpkg can compile and run it
+return package  -- [REQUIRED] Always return your package table
 ```
 
 &nbsp;
