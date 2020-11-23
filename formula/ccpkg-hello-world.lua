@@ -24,11 +24,11 @@ end
 -- This hook is called during the installation of the package, if it
 -- exists on the formula, this will be ran instead of ccpkg install
 -- code, allowing custom installations
-function package:install(ccpkg, artifacts, version)  -- [OPTIONAL] An installation hook. Allows custom logic for installation
-    -- As an example, we don't actually do anything custom, we just include
-    -- the package as normal
-    ccpkg.include(artifacts, self.name, version)
-end
+--function package:install(ccpkg, artifacts, version)  -- [OPTIONAL] An installation hook. Allows custom logic for installation
+--    -- As an example, we don't actually do anything custom, we just include
+--    -- the package as normal
+--    ccpkg.include(artifacts, self.name, version)
+--end
 
 -- TODO
 -- This hook is called right before the package is installed
