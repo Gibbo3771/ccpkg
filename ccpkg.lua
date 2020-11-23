@@ -74,10 +74,12 @@ local vendorPath = path.."/vendor/"
 local cachePath = "/ccpkg/cache/"
 local tmpPath = "/ccpkg/tmp/"
 local globalPath = "/ccpkg/global/"
+local supportedFileTypes = { ".lua", ".tar.gz" }
 
 -- If global has been passed as the base command
 local isGlobal = false
 local noStartup = false
+local fileType -- The type of file the package is, references to supportedFileTypes
 local color = term.isColor();
 
 local function log(color, message)
@@ -113,6 +115,10 @@ local function splitIntoNameAndVersion(package)
     return pkg
 end
 
+local function endsWith(str, ending)
+   return ending == "" or str:sub(-#ending) == ending
+end
+
 -- A helper that resolves the project path depending on the 
 -- global flag
 -- @param path the path to resolve
@@ -132,6 +138,15 @@ local function retrieveFromCache(name)
             return sFileName
         end
     end
+end
+
+--
+local function getFileTypeFromUrl(url)
+    for _, t in pairs(supportedFileTypes) do
+        if(endsWith(url, t)) then return t end
+    end
+    printError("Unsupported file type '"..url.."'")
+    error("ccpkg does not know how to handle this type of file")
 end
 
 -- Parses the pkg.json file
@@ -202,12 +217,16 @@ function ccpkg.getFormula(name)
     end
 end
 
--- download the tar.gz from the github release
+-- download the package
 -- @param url the download url
--- @param versionthe version being downloaded
+-- @param version the version being downloaded
 -- @param name the name of the package
 function ccpkg.download(url, version, name)
     log(colors.white, "Downloading package '"..name.."'...")
+    local fileType = getFileTypeFromUrl(url)
+    local mode
+    if(fileType == ".tar.gz") then mode = "b" end
+
     local path = cachePath..name.."-"..version
     local h, err, res = http.get(url, nil, true)
     if(not h) then
@@ -215,7 +234,7 @@ function ccpkg.download(url, version, name)
         log(colors.red, "Error: "..err..". ".."HTTP Code: "..res.getResponseCode())
         error("Failed to download, exiting")
     end
-    local fh, err = io.open(path..".tar.gz", "wb")
+    local fh, err = io.open(path..fileType, "w"..(mode or ""))
     if(err) then
         printError("Could not create entry file")
         error(err) 
@@ -293,7 +312,6 @@ end
 -- @returns the path to the extracted archives
 function ccpkg.extractTar(name, version)
     local tar = require("tar")
-    local tar = require("tar")
     log(colors.white, "Decompressing archive..")
     local t = tar.decompress(cachePath..name.."-"..version..".tar.gz")
     t = tar.load(t, false, true)
@@ -301,6 +319,12 @@ function ccpkg.extractTar(name, version)
     local tmp = tmpPath..name -- tmp directory just for this package download
     fs.makeDir(tmp)
     tar.extract(t, tmp)
+    return tmp
+end
+
+function ccpkg.standAloneScript(name, version)
+    local tmp = tmpPath..name -- tmp directory just for this package download
+    fs.makeDir(tmp)
     return tmp
 end
 
@@ -335,14 +359,21 @@ function ccpkg.add(package, skipPkgUpdate)
     if(version == "stable") then
         version = formula.stable()
     end
+    
+    local url = formula.versions[version]
     local file = retrieveFromCache(name)
     if(not file) then
-        ccpkg.download(formula.versions[version], version, name)
+        ccpkg.download(url, version, name)
     else
         log(colors.white, "Installing "..name.." from cache")
     end
     
-    local artifacts = ccpkg.extractTar(name, version)
+    -- The location where the package artifacts will exist
+    local artifacts
+    
+    if(fileType == ".lua") then artifacts = ccpkg.standAloneScript(name, version) end
+    if(fileType == ".tar.gz") then artifacts = ccpkg.extractTar(name, version) end
+    
     -- If the formula specifies an install function, we let that run instead
     if(formula.install) then
         formula.install(ccpkg, artifacts, version)
