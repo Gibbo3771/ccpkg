@@ -17,7 +17,7 @@ end
 
 
 function package:install(ccpkg, artifacts, version)
-    shell.run(ccpkg.."/mbs.lua", "run")
+    shell.run(ccpkg.."/mbs.lua", "install")
 end
 
 function package:uninstall(ccpkg, version)
