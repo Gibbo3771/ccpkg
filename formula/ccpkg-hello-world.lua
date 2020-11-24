@@ -41,9 +41,7 @@ end
 -- This hook is called during the uninstallation of a package
 -- code, allowing custom installations
 function package:uninstall(env, ccpkg, artifacts, version)  -- [OPTIONAL] An uninstallation hook. Allows custom logic for uninstallation
-    -- As an example, we don't actually do anything custom, we just remove
-    -- the package as normal
-    ccpkg.remove(artifacts, self.name, version)
+    -- As an example, we don't actually do anything custom
 end
 
 return package  -- [REQUIRED] Always return your package table
