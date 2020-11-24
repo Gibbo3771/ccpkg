@@ -151,7 +151,7 @@ end
 
 -- Parses the pkg.json file
 -- @returns a table representation of the file
-function ccpkg.parsePkgJson()
+function ccpkg:parsePkgJson()
     local fh, err = io.open(resolvePath("pkg.json"), "r")
     if(err) then error(err) end
     local json = textutils.unserialiseJSON(fh:read())
@@ -162,7 +162,7 @@ end
 -- Updates the pkg.json file on file. This is a complete replacement.
 -- @param pkg the contents to put into the file
 -- @returns the updated file in json format
-function ccpkg.updatePkgJson(pkg)
+function ccpkg:updatePkgJson(pkg)
     local fh, err = io.open(resolvePath("pkg.json"), "w")
     if(err) then error(err) end
     local json = textutils.serializeJSON(pkg)
@@ -174,8 +174,8 @@ end
 -- Adds a dependency to the pkg file
 -- @param name the name of the package
 -- @param version the version of the package
-function ccpkg.addToPkgJson(name, version)
-    local pkg = ccpkg.parsePkgJson()
+function ccpkg:addToPkgJson(name, version)
+    local pkg = ccpkg:parsePkgJson()
     if(pkg.dependencies[name]) then
         if(pkg.dependencies[name] ~= version) then
             log(colors.orange, "You already have this package installed as version '"..version.."'")
@@ -191,13 +191,13 @@ function ccpkg.addToPkgJson(name, version)
     else
         pkg.dependencies[name] = version
     end
-    ccpkg.updatePkgJson(pkg)
+    ccpkg:updatePkgJson(pkg)
 end
 
 -- Downloads a formula from the main repository
 -- @param name the name of the formula
 -- @returns the compiled formula
-function ccpkg.getFormula(name)
+function ccpkg:getFormula(name)
     log(colors.white, "Looking for formula '"..name.."'...")
     local req = http.get("https://raw.githubusercontent.com/Gibbo3771/ccpkg/main/formula/"..name..".lua")
     if(not req) then
@@ -221,7 +221,7 @@ end
 -- @param url the download url
 -- @param version the version being downloaded
 -- @param name the name of the package
-function ccpkg.download(url, version, name)
+function ccpkg:download(url, version, name)
     log(colors.white, "Downloading package '"..name.."'...")
     local fileType = getFileTypeFromUrl(url)
     local mode
@@ -252,7 +252,7 @@ end
 -- question will be skipped.
 -- @param name the name of the project, this will fill in the 'name' field in the pkg.json
 -- @throws if it can not create a pkg.json file, or an init.lua entry file, or if it can't create a startup file
-function ccpkg.new(name)
+function ccpkg:new(name)
     function createPackageFile()
         local defaultPkgFile = {version = "1.0.0", name = name, dependencies = {}}
         fs.makeDir(vendorPath)
@@ -279,8 +279,8 @@ function ccpkg.new(name)
     log(colors.white, "Creating new project '"..name.."'")
     createPackageFile()
     createEntryFile()
-    local pkg = ccpkg.parsePkgJson()
-    ccpkg.updatePkgJson(pkg)
+    local pkg = ccpkg:parsePkgJson()
+    ccpkg:updatePkgJson(pkg)
     if(not noStartup) then
         log(colors.cyan, "Would you like to create a startup file for this project? (this will automatically start it on boot) (y/n)")
         local answer
@@ -310,7 +310,7 @@ end
 -- @param name the name of the package
 -- @param version the version of the package
 -- @returns the path to the extracted archives
-function ccpkg.extractTar(name, version)
+function ccpkg:extractTar(name, version)
     local tar = require("tar")
     log(colors.white, "Decompressing archive..")
     local t = tar.decompress(cachePath..name.."-"..version..".tar.gz")
@@ -322,7 +322,7 @@ function ccpkg.extractTar(name, version)
     return tmp
 end
 
-function ccpkg.standAloneScript(name, version)
+function ccpkg:standAloneScript(name, version)
     local tmp = tmpPath..name -- tmp directory just for this package download
     fs.makeDir(tmp)
     return tmp
@@ -332,7 +332,7 @@ end
 -- @param artifacts the path to the package artifacts
 -- @param name the name of the package
 -- @param version the version of the package
-function ccpkg.include(artifacts, name, version)
+function ccpkg:include(artifacts, name, version)
     local destination
     if(isGlobal) then destination = globalPath.."/vendor/" else destination = vendorPath end
     
@@ -351,9 +351,9 @@ end
 -- Adds a new package
 -- @param package the name and semantic version separate by an @, or just the name
 -- @param skipPkgUpdate if passed as true, updating the pkg json will be skipped
-function ccpkg.add(package, skipPkgUpdate)    
+function ccpkg:add(package, skipPkgUpdate)    
     local name, version = unpack(splitIntoNameAndVersion(package))
-    local formula = ccpkg.getFormula(name)
+    local formula = ccpkg:getFormula(name)
     -- If no version is passed, we set it to resolve
     -- to whatever version the formula specifies as "stable"
     if(version == "stable") then
@@ -361,9 +361,10 @@ function ccpkg.add(package, skipPkgUpdate)
     end
     
     local url = formula.versions[version]
+    local fileType = getFileTypeFromUrl(url)
     local file = retrieveFromCache(name)
     if(not file) then
-        ccpkg.download(url, version, name)
+        ccpkg:download(url, version, name)
     else
         log(colors.white, "Installing "..name.." from cache")
     end
@@ -371,18 +372,18 @@ function ccpkg.add(package, skipPkgUpdate)
     -- The location where the package artifacts will exist
     local artifacts
     
-    if(fileType == ".lua") then artifacts = ccpkg.standAloneScript(name, version) end
-    if(fileType == ".tar.gz") then artifacts = ccpkg.extractTar(name, version) end
+    if(fileType == ".lua") then artifacts = ccpkg:standAloneScript(name, version) end
+    if(fileType == ".tar.gz") then artifacts = ccpkg:extractTar(name, version) end
     
     -- If the formula specifies an install function, we let that run instead
     if(formula.install) then
-        formula.install(ccpkg, artifacts, version)
+        formula:install(self, artifacts, version)
     else
-        ccpkg.include(artifacts, name, version)
+        ccpkg:include(artifacts, name, version)
     end
     
     if(not skipPkgUpdate) then 
-        ccpkg.addToPkgJson(name, version) 
+        ccpkg:addToPkgJson(name, version) 
         if(not isGlobal) then 
             log(colors.green, name.." has been added to your project as a dependency") 
         else 
@@ -393,39 +394,39 @@ end
 
 -- Removes an existing package as a dependency
 -- @param name the name of the package
-function ccpkg.remove(name)
+function ccpkg:remove(name)
     local path
     if(isGlobal) then path = globalPath.."/vendor/" else path = vendorPath end
-    local pkg = ccpkg.parsePkgJson()
+    local pkg = ccpkg:parsePkgJson()
     local deps = pkg.dependencies
     if(not deps[name]) then
         log(colors.orange, "You do not have "..name.." as a dependency") 
     else
         local version = deps[name]
         deps[name] = nil
-        ccpkg.updatePkgJson(pkg)
+        ccpkg:updatePkgJson(pkg)
         fs.delete(path..name)
         log(colors.lime, "Removed "..name.." successfully")
     end
 end
 
 -- Installs all the dependencies specified in the pkg.json
-function ccpkg.installFromPkg()
+function ccpkg:installFromPkg()
     log(colors.white, "Installing dependencies")
-    local pkg = ccpkg.parsePkgJson()
+    local pkg = ccpkg:parsePkgJson()
     local noop = true
     for name, version in pairs(pkg.dependencies) do
         if(not fs.exists(vendorPath..name)) then 
             noop = false
-            ccpkg.add(name.."@"..version, true)
+            ccpkg:add(name.."@"..version, true)
         end
     end
     if(noop) then log(colors.limed, "Up to date!") end
 end
 
--- Runs a local file using ccpkg. This handles setting `package.path` so that
+-- Runs a local file using ccpkg: This handles setting `package.path` so that
 -- ccpkg can resolve packages in the local project, or in the global
-function ccpkg.run()
+function ccpkg:run()
     table.remove(params, 1) -- 'run' arg
     local program = params[1]
     table.remove(params, 1) -- program name
@@ -465,7 +466,7 @@ if(command == "new") then
     for _, flag in ipairs(params) do
         if(flag == "--no-startup") then noStartup = true end
     end
-    ccpkg.new(name)
+    ccpkg:new(name)
     log(colors.lime, "Finished, happy coding!")
     return
 elseif(command == "add") then
@@ -485,7 +486,7 @@ elseif(command == "add") then
         printError("Pass the name of the package you want to add")
         return
     end
-    ccpkg.add(package)
+    ccpkg:add(package)
     return
 elseif(command == "remove") then
     local sub = params[2] or nil -- subcommand
@@ -500,13 +501,13 @@ elseif(command == "remove") then
         printError("Not in a project directory, run 'ccpkg new <project-name>'")
         return
     end
-    ccpkg.remove(package)
+    ccpkg:remove(package)
     return
 elseif(command == "install") then
-    ccpkg.installFromPkg()
+    ccpkg:installFromPkg()
     return
 elseif(command == "run") then
-    ccpkg.run()
+    ccpkg:run()
     return
 end
 

@@ -29,7 +29,7 @@ end
 function package:install(ccpkg, artifacts, version)  -- [OPTIONAL] An installation hook. Allows custom logic for installation
     -- As an example, we don't actually do anything custom, we just include
     -- the package as normal
-    ccpkg.include(artifacts, self.name, version)
+    ccpkg:include(artifacts, self.name, version)
 end
 
 -- TODO
