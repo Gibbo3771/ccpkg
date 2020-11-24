@@ -22,9 +22,9 @@ end
 
 function package:uninstall(env, ccpkg, version)
     local fs = env.fs
-    fs.remove("/.mbs")
-    fs.remove("/startup/00_mbs.lua")
-    fs.remove("/mbs.lua")
+    fs.delete("/.mbs")
+    fs.delete("/startup/00_mbs.lua")
+    fs.delete("/mbs.lua")
 end
 
 return package
