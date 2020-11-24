@@ -5,7 +5,7 @@ local package = {
     repository = "https://github.com/Gibbo3771/mbs",
     authors = { "Jonathan Coates" },
     license = "MIT",
-    globalOnly = true,
+    library = false,
     versions = {
         ["1.0.0"] = "https://github.com/Gibbo3771/mbs/archive/1.0.0.tar.gz",
     }

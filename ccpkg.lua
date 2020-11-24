@@ -74,7 +74,7 @@ local vendorPath = path.."/vendor/"
 local cachePath = "/ccpkg/cache/"
 local tmpPath = "/ccpkg/tmp/"
 local globalPath = "/ccpkg/global/"
-local supportedFileTypes = { ".lua", ".tar.gz" }
+local supportedFileTypes = { ".tar.gz" }
 
 -- If global has been passed as the base command
 local isGlobal = false
@@ -512,6 +512,7 @@ elseif(command == "remove") then
     ccpkg:remove(package)
     return
 elseif(command == "install") then
+    
     ccpkg:installFromPkg()
     return
 elseif(command == "run") then
