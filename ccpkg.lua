@@ -383,11 +383,15 @@ function ccpkg:add(package, skipPkgUpdate)
     end
     
     if(not skipPkgUpdate) then 
-        ccpkg:addToPkgJson(name, version) 
-        if(not isGlobal) then 
-            log(colors.green, name.." has been added to your project as a dependency") 
-        else 
-            log(colors.green, name.." has been added globally") 
+        ccpkg:addToPkgJson(name, version)
+        if(formula.install) then
+            log(colors.green, name.." has been added. To remove it, run ccpkg remove global "..name) 
+        else
+            if(not isGlobal) then 
+                log(colors.green, name.." has been added to your project as a dependency") 
+            else 
+                log(colors.green, name.." has been added globally") 
+            end
         end
     end
 end
@@ -403,6 +407,10 @@ function ccpkg:remove(name)
         log(colors.orange, "You do not have "..name.." as a dependency") 
     else
         local version = deps[name]
+        local formula = ccpkg:getFormula(name)
+        if(formula.uninstall) then
+           formula:uninstall(self) 
+        end
         deps[name] = nil
         ccpkg:updatePkgJson(pkg)
         fs.delete(path..name)
