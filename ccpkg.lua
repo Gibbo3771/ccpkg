@@ -377,7 +377,7 @@ function ccpkg:add(package, skipPkgUpdate)
     
     -- If the formula specifies an install function, we let that run instead
     if(formula.install) then
-        formula:install(self, artifacts, version)
+        formula:install(_ENV, self, artifacts, version)
     else
         ccpkg:include(artifacts, name, version)
     end
@@ -409,7 +409,7 @@ function ccpkg:remove(name)
         local version = deps[name]
         local formula = ccpkg:getFormula(name)
         if(formula.uninstall) then
-           formula:uninstall(self) 
+           formula:uninstall(_ENV, self) 
         end
         deps[name] = nil
         ccpkg:updatePkgJson(pkg)

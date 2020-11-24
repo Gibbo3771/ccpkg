@@ -16,11 +16,12 @@ function package:stable()
 end
 
 
-function package:install(ccpkg, artifacts, version)
-    shell.run(ccpkg.."/mbs.lua", "install")
+function package:install(env, ccpkg, artifacts, version)
+    env.shell.run(ccpkg.."/mbs.lua", "install")
 end
 
-function package:uninstall(ccpkg, version)
+function package:uninstall(env, ccpkg, version)
+    local fs = env.fs
     fs.remove("/.mbs")
     fs.remove("/startup/00_mbs.lua")
     fs.remove("/mbs.lua")
