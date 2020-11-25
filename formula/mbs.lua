@@ -19,10 +19,10 @@ end
 function package:install(env, ccpkg, artifacts, version)
     local fs = env.fs
     fs.makeDir("/.mbs")
+    fs.makedir("/ccpkg/lib/mbs")
     fs.move(artifacts.."/bin", "/.mbs/bin")
     fs.move(artifacts.."/lib", "/.mbs/lib")
     fs.move(artifacts.."/modules", "/.mbs/modules")
-    fs.mkdir("/ccpkg/lib/mbs")
     env.fs.move(artifacts.."/mbs.lua", "/ccpkg/lib/mbs/mbs.lua")
     
     local handle = fs.open("startup/00_mbs.lua", "w")
