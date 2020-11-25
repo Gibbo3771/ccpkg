@@ -225,11 +225,12 @@ function ccpkg:install(package)
     end
 
     -- The location where the package artifacts will exist
-    local artifacts = ccpkg:extractTar(name, version)
-    artifacts = artifacts.."/"..name.."-"..version
+    local artifactsRoot = ccpkg:extractTar(name, version)
+    local artifacts = artifactsRoot.."/"..name.."-"..version
 
     formula:install(_ENV, self, artifacts, version)
     ccpkg:addToPkgJson(name, version)
+    fs.delete(artifactsRoot)
     log(colors.green, name.." has been sucessfully installed")
 end
 
@@ -269,7 +270,6 @@ elseif(command == "remove") then
     if(p ~= 0) then
         ccpkg:uninstall(package)
         log(colors.lime, "Finished!")
-        ccpkg:uninstall(package)
         return
     end
     log(colors.orange, package.." is not installed")

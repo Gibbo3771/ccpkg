@@ -17,14 +17,24 @@ end
 
 
 function package:install(env, ccpkg, artifacts, version)
-    env.shell.run(artifacts.."/mbs.lua", "install")
+    local fs = env.fs
+    fs.makeDir("/.mbs")
+    fs.move(artifacts.."/bin", "/.mbs")
+    fs.move(artifacts.."/lib", "/.mbs")
+    fs.move(artifacts.."/modules", "/.mbs")
+    fs.mkdir("/ccpkg/lib/mbs")
+    env.fs.move(artifacts.."/mbs.lua", "/ccpkg/lib/mbs")
+    
+    local handle = fs.open("startup/00_mbs.lua", "w")
+    handle.writeLine(("assert(loadfile('/ccpkg/lib/mbs/mbs.lua', _ENV))('startup', '/ccpkg/lib/mbs/mbs.lua')"))
+    handle.close()
 end
 
 function package:uninstall(env, ccpkg, version)
     local fs = env.fs
     fs.delete("/.mbs")
     fs.delete("/startup/00_mbs.lua")
-    fs.delete("/mbs.lua")
+    fs.delete("/ccpkg/lib/mbs")
 end
 
 return package
