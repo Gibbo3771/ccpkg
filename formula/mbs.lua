@@ -17,7 +17,7 @@ end
 
 
 function package:install(env, ccpkg, artifacts, version)
-    env.shell.run(artifacts..self.name.."-"..version.."/mbs.lua", "install")
+    env.shell.run(artifacts.."/mbs.lua", "install")
 end
 
 function package:uninstall(env, ccpkg, version)

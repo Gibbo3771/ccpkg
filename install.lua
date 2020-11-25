@@ -19,9 +19,7 @@ local startupContent = [=[
 -- Issues: https://github.com/Gibbo3771/ccpkg/issues
 -- 
 --
--- This is your entry file for your project.
--- You can call this from your startup file or call it directly from
--- the terminal.
+-- This is a startup file to ensure ccpkg is loaded into the path properly
 
 -- AUTO GENERATED DO NOT EDIT OR DELETE
 -- If you must modify the path, ensure you do not remove existing entries

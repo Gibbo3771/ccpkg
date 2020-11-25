@@ -1,3 +1,23 @@
+            
+--                           _                
+--                          | |               
+--             ___ ___ _ __ | | ____ _        
+--            / __/ __| '_ \| |/ / _` |       
+--           | (_| (__| |_) |   < (_| |       
+--            \___\___| .__/|_|\_\__, |       
+--                    | |         __/ |       
+--                    |_|        |___/        
+--      
+--      The package manager for ComputerCraft
+--
+-- Created By: Stephen Gibson
+-- Github: https://github.com/Gibbo3771/ccpkg
+-- Docs: https://github.com/Gibbo3771/ccpkg/blob/main/README.md
+-- Issues: https://github.com/Gibbo3771/ccpkg/issues
+--
+--
+
+
 local params = {...}
 local ccpkg = {}
 
@@ -6,66 +26,7 @@ if(table.getn(params) == 0) then
     return
 end
 
-local initFileContents = [=[
--- ______             _       _                                  _ 
--- | ___ \           | |     | |                                | |
--- | |_/ / ___   ___ | |_ ___| |_ _ __ __ _ _ __  _ __   ___  __| |
--- | ___ \/ _ \ / _ \| __/ __| __| '__/ _` | '_ \| '_ \ / _ \/ _` |
--- | |_/ / (_) | (_) | |_\__ \ |_| | | (_| | |_) | |_) |  __/ (_| |
--- \____/ \___/ \___/ \__|___/\__|_|  \__,_| .__/| .__/ \___|\__,_|
---                                         | |   | |               
---                                         |_|   |_|               
---                 _                              _                
---                (_)                            | |               
---       _   _ ___ _ _ __   __ _    ___ ___ _ __ | | ____ _        
---      | | | / __| | '_ \ / _` |  / __/ __| '_ \| |/ / _` |       
---      | |_| \__ \ | | | | (_| | | (_| (__| |_) |   < (_| |       
---       \__,_|___/_|_| |_|\__, |  \___\___| .__/|_|\_\__, |       
---                          __/ |          | |         __/ |       
---                         |___/           |_|        |___/        
---
---
--- Created By: Stephen Gibson
--- Github: https://github.com/Gibbo3771/ccpkg
--- Docs: https://github.com/Gibbo3771/ccpkg/blob/main/README.md
--- Issues: https://github.com/Gibbo3771/ccpkg/issues
--- 
---
--- This is your entry file for your project.
--- You can call this from your startup file or call it directly from
--- the terminal.
 
--- AUTO GENERATED DO NOT EDIT OR DELETE
--- If you must modify the path, ensure you do not remove existing entries
--- as this will break ccpkg module resolution
-local paths = {
-    "/#{path}/vendor/?.lua", -- Always resolve local modules first
-    "/#{path}/vendor/?",
-    "/ccpkg/?.lua",
-    "/ccpkg/?",
-    "/ccpkg/global/vendor/?",
-    "/ccpkg/global/vendor/?.lua",
-    package.path,
-}
-package.path = table.concat(paths, ";")
-
--- You can add your code below this comment
-]=]
-
-local startupFileContents = [=[
--- AUTO GENERATED DO NOT EDIT OR DELETE
--- If you must modify the path, ensure you do not remove existing entries
--- as this will break ccpkg module resolution
-local paths = {
-    "/#{path}/init.lua", -- Resolve the init file
-    "/#{path}/init",
-    package.path,
-}
-package.path = table.concat(paths, ";")
-
--- Load your script on startup
-require("#{init}")
-]=]
 
 local command = params[1]
 
@@ -217,7 +178,7 @@ function ccpkg:download(url, version, name)
         log(colors.red, "Error: "..err..". ".."HTTP Code: "..res.getResponseCode())
         error("Failed to download, exiting")
     end
-    local fh, err = io.open(path..fileType, "wb")
+    local fh, err = io.open(path..".tar.gz", "wb")
     if(err) then
         printError("Could write package tar to disk")
         error(err) 
@@ -255,7 +216,7 @@ function ccpkg:install(package)
     end
     
     local url = formula.versions[version]
-    local fileType = getFileTypeFromUrl(url)
+    fileType = getFileTypeFromUrl(url)
     local file = retrieveFromCache(name)
     if(not file) then
         ccpkg:download(url, version, name)
@@ -264,9 +225,10 @@ function ccpkg:install(package)
     end
     
     -- The location where the package artifacts will exist
-    local artifacts
+    local artifacts = ccpkg:extractTar(name, version)
+    artifacts = artifacts.."/"..name.."-"..version
+    print(artifacts)
     
-    if(fileType == ".tar.gz") then artifacts = ccpkg:extractTar(name, version) end
     formula:install(_ENV, self, artifacts, version)
     log(colors.green, name.." has been sucessfully installed") 
 end
