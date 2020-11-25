@@ -19,11 +19,11 @@ end
 function package:install(env, ccpkg, artifacts, version)
     local fs = env.fs
     fs.makeDir("/.mbs")
-    fs.move(artifacts.."/bin", "/.mbs/")
-    fs.move(artifacts.."/lib", "/.mbs/")
-    fs.move(artifacts.."/modules", "/.mbs/")
+    fs.move(artifacts.."/bin", "/.mbs/bin")
+    fs.move(artifacts.."/lib", "/.mbs/lib")
+    fs.move(artifacts.."/modules", "/.mbs/modules")
     fs.mkdir("/ccpkg/lib/mbs")
-    env.fs.move(artifacts.."/mbs.lua", "/ccpkg/lib/mbs")
+    env.fs.move(artifacts.."/mbs.lua", "/ccpkg/lib/mbs/mbs.lua")
     
     local handle = fs.open("startup/00_mbs.lua", "w")
     handle.writeLine(("assert(loadfile('/ccpkg/lib/mbs/mbs.lua', _ENV))('startup', '/ccpkg/lib/mbs/mbs.lua')"))
