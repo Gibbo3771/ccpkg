@@ -1,23 +1,17 @@
 # ccpkg - a Computer Craft powered package manager
 
 
-An early work in progress for a lua package manager specifically for Computer Craft (CC).
+An early work in progress for a package manager specifically for Computer Craft (CC).
 
-ccpkg will allow CC programmers to come together and share common code without having the problems associated with pastebin. Manage each version through the central "repository" (lives [here](https://github.com/Gibbo3771/ccpkg/tree/main/formula)) using lua scripts, add, remove and update packages on the fly.
-
-&nbsp;
+ccpkg will allow CC programmers distribute their programs and avoid issues that come with pastebin, such as versioning and permanent urls. Manage each version through the central "repository" (lives [here](https://github.com/Gibbo3771/ccpkg/tree/main/formula)) using lua scripts, add, remove and update packages on the fly.
 
 
 ## Features
 Features are being put in quite frequently, so far we support the following operations:
 
-* Add and remove packages from formula definitions
-* Local and global dependencies
+* Add and remove packages using formula definitions
 * Package versioning (no auto diffing)
-* Create projects for locally scoped dependencies
-* Priority dependency resolution (checks local before global)
-* Startup configuration to autoload paths, with optional bootstrapped startup file per project
-* Built in `run` command to execute non project scripts with ccpkg module resolution
+* Startup configuration to autoload paths
 * Package caching
 * Colored output and extensive logging
 
@@ -29,9 +23,7 @@ Features are being put in quite frequently, so far we support the following oper
 There is quite a few things missing that I want to get around to doing.
 
 * Pre and Post installation hooks
-* Resolve dependencies of dependencies if they are ccpkg projects
-* .gitignore tempate
-* "binary" installation method to allow execution of entire programs (think entire turtle programs)
+* Resolve dependencies
 * Additional fields in formula such as liscence, email, contributors etc
 * Master list maintained via CI
 * Query said master list to provide autocomplete functions 
@@ -48,21 +40,10 @@ When asked to enable **global** packages, say yes. You can read more about globa
 ### Example
 
 You can see an example by following the commands below:
+```sh
+ccpkg install ccpkg-hello-world
 ```
-mkdir example
-cd example
-ccpkg new example
-ccpkg add ccpkg-hello-world
-edit init
-```
-Inside the `init` file, enter the following code below the existing code):
-
-```lua
-local h = require("ccpkg-hello-world.hello")
-h:hello()
-```
-
-Test it by running `init`.
+Once installation is complete, you can run `say-hello` from your terminal
 
 &nbsp;
 
@@ -70,37 +51,11 @@ Test it by running `init`.
 ### Commands
 Below is the list of commands you can run:
 
-`ccpkg new <project-name>` - Create a new project with the given name (*this does not create a folder!*)
-
-`ccpkg add <package-name>` - Add a package to your project as a dependency
-
 `ccpkg remove <package-name>` - Remove a package
 
-`ccpkg run <file>` - Runs a script using the ccpkg environment
-
-`ccpkg install` - Installs all the dependencies specified in the `pkg.json`
+`ccpkg install <package-name>` - Installs a package
 
 That's pretty much it.
-
-&nbsp;
-
-
-### Global packages
-
-As well as installing packages locally on a per project basis, you can also
-install them **globally**. This is most useful when you want to include entire programs
-in all your projects, or if you simply want to install a program and run it from
-your start file without having to create a project using `new`.
-
-To use **global** packages, you can include the `global` sub command.
-
-Adding a package:
-
-`ccpkg add global <package-name>`
-
-Removing a package:
-
-`ccpkg remove global <package-name>`
 
 &nbsp;
 
@@ -110,20 +65,46 @@ Removing a package:
 The anatomy of a Formula file, comments explain each section. This formula has been taken from the `ccpkh-hello-world` formula:
 
 ```lua
+-- This is an example formula you can use as a template, it is self documented and contains the most up to
+-- date formula definition
+
 local package = { -- [REQUIRED] The table that ccpkg will require when it downloads the formula and compiles it
     name = "ccpkg-hello-world", -- [REQUIRED] The name of the package
     description = "This is an example formula", -- [REQUIRED] The description of the package
     homepage = "https://github.com/Gibbo3771/ccpkg-hello-world", -- [OPTIONAL] The homepage for the package
     repository = "https://github.com/Gibbo3771/ccpkg-hello-world", -- [OPTIONAL] The repository for the package
-    authors = { "Stephen Gibson" } -- [OPTIONAL] An array of authors for this package
+    authors = { "Stephen Gibson" }, -- [OPTIONAL] An array of authors for this package
+    contributors = { },  -- [OPTIONAL] An array of contributors to this package
+    license = "MIT",  -- [RECOMMENDED] The license that this package lives under
+    library = false,  -- [OPTIONAL] If this package is a library, defaults to false.
+    target = "*" -- [RECOMMENDED] Specify if this package was created for either 'computer', 'turtle' or '*' for any
     versions = { -- [REQUIRED] A table of the available versions, where the key is the version number and the value is the download url
+        ["3.0.0"] = "https://github.com/Gibbo3771/ccpkg-hello-world/archive/3.0.0.tar.gz",
         ["2.0.0"] = "https://github.com/Gibbo3771/ccpkg-hello-world/archive/2.0.0.tar.gz",
         ["1.0.0"] = "https://github.com/Gibbo3771/ccpkg-hello-world/archive/1.0.0.tar.gz"
     }
 }
 
 function package:stable() -- [REQUIRED] Specifies the "stable" version of the package
-   return "2.0.0"
+   return "3.0.0"
+end
+
+-- TODO
+-- This hook is called right before the package is installed
+function package:preInstall(version)  -- [OPTIONAL] A pre install hook
+    -- Do some stuff
+end
+
+-- This hook is called during the installation of the package, if it
+-- exists on the formula, this will be ran instead of ccpkg install
+-- code, allowing custom installations
+-- @param env the env that the script was executed from
+-- @param ccpkg the ccpkg instance
+-- @param artifacts the directory where the package artifacts are located
+-- @param version the version of the package being installed
+function package:install(env, ccpkg, artifacts, version)  -- [OPTIONAL] An installation hook. Allows custom logic for installation
+    -- We move our script into the bin path so it's available globally
+    env.fs.move(artifacts.."/say-hello.lua", "/ccpkg/bin/say-hello.lua")
 end
 
 -- TODO
@@ -132,19 +113,16 @@ function package:postInstall(version)  -- [OPTIONAL] A post install hook
     -- Do some stuff
 end
 
--- This hook is called during the installation of the package, if it
--- exists on the formula, this will be ran instead of ccpkg install
+-- This hook is called during the uninstallation of a package
 -- code, allowing custom installations
-function package:install(ccpkg, artifacts, version)  -- [OPTIONAL] An installation hook. Allows custom logic for installation
-    -- As an example, we don't actually do anything custom, we just include
-    -- the package as normal
-    ccpkg.include(artifacts, self.name, version)
-end
+-- @param env the env that the script was executed from
+-- @param ccpkg the ccpkg instance
+-- @param artifacts the directory where the package artifacts are located
+-- @param version the version of the package being uninstalled
+function package:uninstall(env, ccpkg, artifacts, version)  -- [OPTIONAL] An uninstallation hook. Allows custom logic for uninstallation
+    -- We remove our script
+    env.fs.delete("/ccpkg/bin/say-hello.lua")
 
--- TODO
--- This hook is called right before the package is installed
-function package:preInstall(version)  -- [OPTIONAL] A pre install hook
-    -- Do some stuff
 end
 
 return package  -- [REQUIRED] Always return your package table
@@ -180,5 +158,6 @@ My only package sucks.
 ## NOTE
 
 I still have to give credit where credit is due, thanks to [CC-Tweaked](https://github.com/Gibbo3771/CC-Tweaked) for keeping the CC mod alive in newer versions and thanks to [CC-Arhive](https://github.com/MCJack123/CC-Archive) for the gzip/tar implementation. I will put this in a proper blurb soon.
+
 
 

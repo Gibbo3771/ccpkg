@@ -1,3 +1,6 @@
+-- This is an example formula you can use as a template, it is self documented and contains the most up to
+-- date formula definition
+
 local package = { -- [REQUIRED] The table that ccpkg will require when it downloads the formula and compiles it
     name = "ccpkg-hello-world", -- [REQUIRED] The name of the package
     description = "This is an example formula", -- [REQUIRED] The description of the package
