@@ -19,7 +19,7 @@ end
 function package:install(env, ccpkg, artifacts, version)
     local fs = env.fs
     fs.makeDir("/.mbs")
-    fs.makedir("/ccpkg/lib/mbs")
+    fs.makeDir("/ccpkg/lib/mbs")
     fs.move(artifacts.."/bin", "/.mbs/bin")
     fs.move(artifacts.."/lib", "/.mbs/lib")
     fs.move(artifacts.."/modules", "/.mbs/modules")
