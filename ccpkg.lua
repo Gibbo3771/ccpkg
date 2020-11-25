@@ -1,13 +1,12 @@
-            
---                           _                
---                          | |               
---             ___ ___ _ __ | | ____ _        
---            / __/ __| '_ \| |/ / _` |       
---           | (_| (__| |_) |   < (_| |       
---            \___\___| .__/|_|\_\__, |       
---                    | |         __/ |       
---                    |_|        |___/        
---      
+--                           _
+--                          | |
+--             ___ ___ _ __ | | ____ _
+--            / __/ __| '_ \| |/ / _` |
+--           | (_| (__| |_) |   < (_| |
+--            \___\___| .__/|_|\_\__, |
+--                    | |         __/ |
+--                    |_|        |___/
+--
 --      The package manager for ComputerCraft
 --
 -- Created By: Stephen Gibson
@@ -126,7 +125,7 @@ end
 -- @param version the version of the package
 function ccpkg:addToPkgJson(name, version)
     local pkg = ccpkg:parsePkgJson()
-    pkg.dependencies[name] = version
+    pkg.installed[name] = version
     ccpkg:updatePkgJson(pkg)
 end
 
@@ -149,9 +148,10 @@ function ccpkg:getFormula(name)
     log(colors.white, "Looking for formula '"..name.."'...")
     local req = http.get("https://raw.githubusercontent.com/Gibbo3771/ccpkg/main/formula/"..name..".lua")
     if(not req) then
-        error("Could not download formula") 
+        error("Could not download formula")
     end
     log(colors.lime, "Found '"..name.."'")
+   
     local func, err = load(req.readAll())
     if func then
         local ok, f = pcall(func)
@@ -181,7 +181,7 @@ function ccpkg:download(url, version, name)
     local fh, err = io.open(path..".tar.gz", "wb")
     if(err) then
         printError("Could write package tar to disk")
-        error(err) 
+        error(err)
     end
     fh:write(h.readAll())
     io.close(fh)
@@ -206,7 +206,7 @@ end
 -- Installs a package
 -- @param package the name and semantic version separate by an @, or just the name
 -- @param skipPkgUpdate if passed as true, updating the pkg json will be skipped
-function ccpkg:install(package)    
+function ccpkg:install(package)
     local name, version = unpack(splitIntoNameAndVersion(package))
     local formula = ccpkg:getFormula(name)
     -- If no version is passed, we set it to resolve
@@ -214,7 +214,7 @@ function ccpkg:install(package)
     if(version == "stable") then
         version = formula.stable()
     end
-    
+
     local url = formula.versions[version]
     fileType = getFileTypeFromUrl(url)
     local file = retrieveFromCache(name)
@@ -223,32 +223,27 @@ function ccpkg:install(package)
     else
         log(colors.white, "Installing "..name.." from cache")
     end
-    
+
     -- The location where the package artifacts will exist
     local artifacts = ccpkg:extractTar(name, version)
     artifacts = artifacts.."/"..name.."-"..version
-    print(artifacts)
-    
+
     formula:install(_ENV, self, artifacts, version)
-    log(colors.green, name.." has been sucessfully installed") 
+    ccpkg:addToPkgJson(name, version)
+    log(colors.green, name.." has been sucessfully installed")
 end
 
 -- Removes an existing package as a dependency
 -- @param name the name of the package
-function ccpkg:remove(name)
+function ccpkg:uninstall(name)
     local pkg = ccpkg:parsePkgJson()
-    local deps = pkg.dependencies
-    if(not deps[name]) then
-        log(colors.orange, "You do not have "..name.." as a dependency") 
-    else
-        local version = deps[name]
-        local formula = ccpkg:getFormula(name)
-        formula:uninstall(_ENV, self) 
-        deps[name] = nil
-        ccpkg:updatePkgJson(pkg)
-        fs.delete(path..name)
-        log(colors.lime, "Removed "..name.." successfully")
-    end
+    local installed = pkg.installed
+    local version = installed[name]
+    local formula = ccpkg:getFormula(name)
+    formula:uninstall(_ENV, self)
+    installed[name] = nil
+    ccpkg:updatePkgJson(pkg)
+    log(colors.lime, "Removed "..name.." successfully")
 end
 
 
@@ -260,25 +255,24 @@ if(command == "install") then
         return
     end
     local p = ccpkg:isInstalled(package)
-    if(p == PACKAGE_INSTALLED) then log(colors.orange, "You already have "..name.."@"..version.." installed") return end
-    if(p == PACKAGE_VERSION_MISMATCH) then log(colors.orange, "You already have this package installed as version '"..version.."'") return end
-    ccpkg:install(package)
-    log(colors.lime, "Finished, happy coding!")
-    return
-elseif(command == "remove") then
-    local sub = params[2] or nil -- subcommand
-    local package
-    if(sub and sub == "global") then 
-        isGlobal = true
-        package = params[3] -- the package to remove
-    else
-        package = params[2] -- no global sub command, second arg must be the package
-    end
-    if(not isProjectFolder() and not isGlobal) then
-        printError("Not in a project directory, run 'ccpkg new <project-name>'")
+    local name, version = unpack(splitIntoNameAndVersion(package))
+    if(p == 0) then
+        ccpkg:install(package)
+        log(colors.lime, "Finished!")
         return
     end
-    ccpkg:remove(package)
+    if(p == PACKAGE_INSTALLED or p == PACKAGE_VERSION_MISMATCH) then log(colors.orange, "You already have '"..package.."' installed") return end
+elseif(command == "remove") then
+    local package = params[2]
+    local p = ccpkg:isInstalled(package)
+    local name, version = unpack(splitIntoNameAndVersion(package))
+    if(p ~= 0) then
+        ccpkg:uninstall(package)
+        log(colors.lime, "Finished!")
+        ccpkg:uninstall(package)
+        return
+    end
+    log(colors.orange, package.." is not installed")
     return
 end
 
