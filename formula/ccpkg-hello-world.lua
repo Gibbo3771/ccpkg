@@ -8,13 +8,14 @@ local package = { -- [REQUIRED] The table that ccpkg will require when it downlo
     license = "MIT",  -- [RECOMMENDED] The license that this package lives under
     library = false,  -- [OPTIONAL] If this package is a library, defaults to false.
     versions = { -- [REQUIRED] A table of the available versions, where the key is the version number and the value is the download url
+        ["3.0.0"] = "https://github.com/Gibbo3771/ccpkg-hello-world/archive/3.0.0.tar.gz",
         ["2.0.0"] = "https://github.com/Gibbo3771/ccpkg-hello-world/archive/2.0.0.tar.gz",
         ["1.0.0"] = "https://github.com/Gibbo3771/ccpkg-hello-world/archive/1.0.0.tar.gz"
     }
 }
 
 function package:stable() -- [REQUIRED] Specifies the "stable" version of the package
-   return "2.0.0"
+   return "3.0.0"
 end
 
 -- TODO
@@ -27,9 +28,8 @@ end
 -- exists on the formula, this will be ran instead of ccpkg install
 -- code, allowing custom installations
 function package:install(env, ccpkg, artifacts, version)  -- [OPTIONAL] An installation hook. Allows custom logic for installation
-    -- As an example, we don't actually do anything custom, we just include
-    -- the package as normal
-    ccpkg:include(artifacts, self.name, version)
+    -- We move our script into the bin path so it's available globally
+    env.fs.move(artifacts.."/say-hello.lua", "/ccpkg/bin/say-hello.lua")
 end
 
 -- TODO
@@ -41,7 +41,9 @@ end
 -- This hook is called during the uninstallation of a package
 -- code, allowing custom installations
 function package:uninstall(env, ccpkg, artifacts, version)  -- [OPTIONAL] An uninstallation hook. Allows custom logic for uninstallation
-    -- As an example, we don't actually do anything custom
+    -- We remove our script
+    env.fs.delete("/ccpkg/bin/say-hello.lua")
+
 end
 
 return package  -- [REQUIRED] Always return your package table
