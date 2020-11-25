@@ -35,7 +35,7 @@ There is quite a few things missing that I want to get around to doing.
 Download the installation script by pasting the following command into your computer:
 `wget run https://raw.githubusercontent.com/Gibbo3771/ccpkg/main/install.lua`
 
-When asked to enable **global** packages, say yes. You can read more about global packages below. You're then all set!
+
 
 ### Example
 
