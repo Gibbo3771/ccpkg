@@ -24,13 +24,36 @@ jobs:
       - uses: actions/checkout@v2
 
       # Runs a single command using the runners shell
-      - name: Install dependencies
+      - name: Install build dependencies
         run: |
             sudo apt-get update -y
+            sudo apt install build-essential libreadline-dev
+            ls
+            
+      - name: Build Lua
+        run: |
+            curl -R -O http://www.lua.org/ftp/lua-5.4.1.tar.gz
+            tar zxf lua-5.4.1.tar.gz
+            cd lua-5.4.1
+            make linux test
+            sudo make install
             sudo apt-get install -y luarocks
             sudo luarocks install json-lua
             sudo luarocks install luafilesystem
-            ls
+            
+      - name: Build Luarocks
+        run: |
+            wget https://luarocks.org/releases/luarocks-3.3.1.tar.gz
+            tar zxpf luarocks-3.3.1.tar.gz
+            cd luarocks-3.3.1
+            ./configure --with-lua-include=/usr/local/include
+            make
+            sudo make install
+            
+      - name: Install Lua dependenices
+        run: |
+            sudo luarocks install json-lua
+            sudo luarocks install luafilesystem
             
       - name: Generate JSON output
         run: lua generate-master-file.lua
