@@ -30,6 +30,9 @@ jobs:
             sudo apt-get install -y luarocks
             sudo luarocks install json-lua
             sudo luarocks install luafilesystem
+            
+      - name: Generate JSON output
+        run: lua generate-master-file
 
 #      # Runs a set of commands using the runners shell
 #      - name: Run a multi-line script
