@@ -55,6 +55,9 @@ Below is the list of commands you can run:
 
 `ccpkg install <package-name>` - Installs a package
 
+`ccpkg search <package-name>` - Search for a package by name
+
+
 That's pretty much it.
 
 &nbsp;

@@ -34,6 +34,7 @@ local cachePath = workingDir.."cache/"
 local tmpPath = workingDir.."tmp/"
 local supportedFileTypes = { ".tar.gz" }
 local color = term.isColor();
+local masterfileUrl = "https://gist.githubusercontent.com/Gibbo3771/016d79e59aa38c80b5deff881455d22f/raw/masterfile.json"
 
 local PACKAGE_INSTALLED = 1
 local PACKAGE_VERSION_MISMATCH = 2
@@ -165,6 +166,25 @@ function ccpkg:getFormula(name)
     end
 end
 
+function ccpkg:updateMasterfile()
+     log(colors.white, "Updating masterfile...")
+    local req = http.get(masterfileUrl)
+    if(not req) then
+        error("Could not download masterfile")
+    end
+    local fh, err = io.open(workingDir.."masterfile.json", "w")
+    fh:write(req.readAll())
+    fh:close()
+end
+
+function ccpkg:parseMasterfile()
+    local fh, err = fs.open(workingDir.."masterfile.json", "rb")
+    if(err) then error(err) end
+    local t = textutils.unserialiseJSON(fh.readAll())
+    fh.close()
+    return t
+end
+
 -- download the package
 -- @param url the download url
 -- @param version the version being downloaded
@@ -247,7 +267,29 @@ function ccpkg:uninstall(name)
     log(colors.green, name.." has been removed successfully")
 end
 
-
+-- Removes an existing package as a dependency
+-- @param name the name of the package
+function ccpkg:search(name)
+    local pkg = ccpkg:parsePkgJson()
+    local installed = pkg.installed
+    local version = installed[name]
+    local masterfile = ccpkg:parseMasterfile()
+    print(masterfile)
+    for _, package in pairs(masterfile.packages) do
+        if(package.name == name) then
+            local i = ""
+            for n, _ in pairs(installed) do
+                if(n == name) then i = "(installed)" end
+            end
+            log(colors.green, "Name: "..name.." "..i)
+            log(colors.green, "Description: "..package.description)    
+            return
+        end
+    end
+    log(colors.organge, "No package '"..name.."' found")
+    installed[name] = nil
+    ccpkg:updatePkgJson(pkg)
+end
 
 if(command == "install") then
     local package = params[2]
@@ -258,6 +300,7 @@ if(command == "install") then
     local p = ccpkg:isInstalled(package)
     local name, version = unpack(splitIntoNameAndVersion(package))
     if(p == 0) then
+        ccpkg:updateMasterfile()
         ccpkg:install(package)
         log(colors.lime, "Finished!")
         return
@@ -273,6 +316,12 @@ elseif(command == "remove") then
         return
     end
     log(colors.orange, package.." is not installed")
+    return
+elseif(command == "search") then
+    local package = params[2]
+    local name, version = unpack(splitIntoNameAndVersion(package))
+    ccpkg:updateMasterfile()
+    ccpkg:search(name)
     return
 end
 
