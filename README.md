@@ -57,6 +57,9 @@ Below is the list of commands you can run:
 
 `ccpkg search <package-name>` - Search for a package by name
 
+`ccpkg list` - Lists all the available packages. (This list could get pretty long, maybe install the `mbs` package to allow scrolling)
+
+
 
 That's pretty much it.
 
