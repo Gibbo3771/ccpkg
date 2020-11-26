@@ -11,17 +11,18 @@ function attrdir (path)
             local fh = assert(io.open(f, "rb"))
             local content = fh:read("*all")
             fh:close()
-            local func, err = load(content)
-            if func then
-                local ok, f = pcall(func)
-                if ok then
-                    print(f.name)
-                else
-                    error("Could not execute formula")
-                end
-            else
-                error("Could not compile formula")
-            end
+            print(content)
+--            local func, err = load(content)
+--            if func then
+--                local ok, f = pcall(func)
+--                if ok then
+--                    print(f.name)
+--                else
+--                    error("Could not execute formula")
+--                end
+--            else
+--                error("Could not compile formula")
+--            end
         end
     end
 end
