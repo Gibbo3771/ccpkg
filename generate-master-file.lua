@@ -26,5 +26,5 @@ local function iterateFolder(path)
 end
 
 local output = iterateFolder("./formula")
-print(JSON:encode(output))
+print(json:encode(output))
 
