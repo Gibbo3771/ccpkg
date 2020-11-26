@@ -8,7 +8,10 @@ function attrdir (path)
         if file ~= "." and file ~= ".." then
             local f = path..'/'..file
             print ("\t "..f)
-            local func, err = load(f)
+            local fh = assert(io.open(f, "r"))
+            local content = fh:read("*all")
+            fh:close()
+            local func, err = load(content)
             if func then
                 local ok, f = pcall(func)
                 if ok then
