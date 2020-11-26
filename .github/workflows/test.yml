@@ -45,10 +45,13 @@ jobs:
             
       - name: Generate JSON output
         run: lua generate-master-file.lua && cat masterfile.json
+        
+      - name: Upload artifact
         uses: actions/upload-artifact@v2
         with:
           name: masterfile
           path: masterfile.json
+          
   deploy:
     runs-on: ubuntu-latest
     steps:
