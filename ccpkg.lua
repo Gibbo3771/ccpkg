@@ -25,8 +25,6 @@ if(table.getn(params) == 0) then
     return
 end
 
-
-
 local command = params[1]
 
 local workingDir = "/ccpkg/"
@@ -39,14 +37,14 @@ local masterfileUrl = "https://gist.githubusercontent.com/Gibbo3771/016d79e59aa3
 local PACKAGE_INSTALLED = 1
 local PACKAGE_VERSION_MISMATCH = 2
 
-local function log(color, message)
+local function log(color, message, inline)
     if(color) then
         local oc = term.getTextColor()
         term.setTextColor(color)
-        print(message)
+        if(not inline) then print(message) else write(message) end
         term.setTextColor(oc)
     else
-        print(message)
+        if(not inline) then print(message) else write(message) end
     end
 end
 
@@ -166,8 +164,9 @@ function ccpkg:getFormula(name)
     end
 end
 
+-- Downloads the new version of the masterfile
 function ccpkg:updateMasterfile()
-     log(colors.white, "Updating masterfile...")
+     log(colors.white, "Updating masterfile...\n")
     local req = http.get(masterfileUrl)
     if(not req) then
         error("Could not download masterfile")
@@ -177,6 +176,7 @@ function ccpkg:updateMasterfile()
     fh:close()
 end
 
+-- Parses the masterfile from the json file on system
 function ccpkg:parseMasterfile()
     local fh, err = fs.open(workingDir.."masterfile.json", "rb")
     if(err) then error(err) end
@@ -251,7 +251,7 @@ function ccpkg:install(package)
     formula:install(_ENV, self, artifacts, version)
     ccpkg:addToPkgJson(name, version)
     fs.delete(artifactsRoot)
-    log(colors.green, name.." has been sucessfully installed")
+    log(colors.green, name.." has been successfully installed")
 end
 
 -- Removes an existing package as a dependency
@@ -264,31 +264,56 @@ function ccpkg:uninstall(name)
     formula:uninstall(_ENV, self)
     installed[name] = nil
     ccpkg:updatePkgJson(pkg)
-    log(colors.green, name.." has been removed successfully")
+    log(colors.green, name.." has been successfully removed")
 end
 
--- Removes an existing package as a dependency
+-- Searches for a package by name
 -- @param name the name of the package
 function ccpkg:search(name)
+    log(colors.organge, "Searching for '"..name.."'...")
     local pkg = ccpkg:parsePkgJson()
     local installed = pkg.installed
     local version = installed[name]
     local masterfile = ccpkg:parseMasterfile()
-    print(masterfile)
     for _, package in pairs(masterfile.packages) do
         if(package.name == name) then
+            local version = installed[name]
             local i = ""
-            for n, _ in pairs(installed) do
-                if(n == name) then i = "(installed)" end
-            end
-            log(colors.green, "Name: "..name.." "..i)
-            log(colors.green, "Description: "..package.description)    
+            if(version) then i = "(installed)" end
+            log(colors.blue, "------------------------------------------")
+            log(colors.yellow, "Name: ", true)
+            log(colors.white, name.." "..i)
+            log(colors.yellow, "Description: ", true)   
+            log(colors.white, package.description)
+            log(colors.blue, "------------------------------------------")
             return
         end
     end
     log(colors.organge, "No package '"..name.."' found")
-    installed[name] = nil
-    ccpkg:updatePkgJson(pkg)
+end
+
+-- List all packages
+-- @param name the name of the package
+function ccpkg:list()
+    log(colors.organge, "All packages")
+    local pkg = ccpkg:parsePkgJson()
+    local installed = pkg.installed
+    local masterfile = ccpkg:parseMasterfile()
+    for _, package in pairs(masterfile.packages) do
+        local i = ""
+        for n, _ in pairs(installed) do
+            if(n == package.name) then i = "(installed)" end
+        end
+        log(colors.blue, "------------------------------------------")
+        log(colors.yellow, "Name: ", true)
+        log(colors.white, package.name.." "..i)
+        log(colors.yellow, "Description: ", true)   
+        log(colors.white, package.description)
+    end
+    log(colors.blue, "------------------------------------------")
+    log(colors.yellow, "Total packages: ", true)
+    log(colors.white, table.getn(masterfile.packages))
+
 end
 
 if(command == "install") then
@@ -322,6 +347,10 @@ elseif(command == "search") then
     local name, version = unpack(splitIntoNameAndVersion(package))
     ccpkg:updateMasterfile()
     ccpkg:search(name)
+    return
+elseif(command == "list") then
+    ccpkg:updateMasterfile()
+    ccpkg:list()
     return
 end
 
