@@ -1,0 +1,68 @@
+name: Generate Masterfile
+
+on:
+  push:
+    branches: [ master ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install build dependencies
+        run: |
+            sudo apt-get update -y
+            sudo apt install build-essential libreadline-dev
+            ls
+            
+      - name: Build Lua
+        run: |
+            curl -R -O http://www.lua.org/ftp/lua-5.4.1.tar.gz
+            tar zxf lua-5.4.1.tar.gz
+            cd lua-5.4.1
+            make linux test
+            sudo make install
+            
+      - name: Build Luarocks
+        run: |
+            wget https://luarocks.org/releases/luarocks-3.3.1.tar.gz
+            tar zxpf luarocks-3.3.1.tar.gz
+            cd luarocks-3.3.1
+            ./configure --with-lua-include=/usr/local/include
+            make
+            sudo make install
+            
+      - name: Install Lua dependenices
+        run: |
+            sudo luarocks install dkjson
+            sudo luarocks install luafilesystem
+            
+      - name: Generate JSON output
+        run: lua generate-master-file.lua && cat masterfile.json
+        
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: masterfile
+          path: ./
+          
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: masterfile
+      - name: Upload to Gist
+        uses: exuanbo/actions-deploy-gist@v1.0.3
+        with:
+          token: ${{ secrets.GIST_TOKEN }}
+          gist_id: 016d79e59aa38c80b5deff881455d22f
+          gist_file_name: masterfile.json
+          file_path: ./masterfile.json
+
