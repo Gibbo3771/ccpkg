@@ -53,6 +53,7 @@ jobs:
           path: masterfile.json
           
   deploy:
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Download artifact
