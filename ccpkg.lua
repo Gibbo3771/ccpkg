@@ -244,7 +244,7 @@ function ccpkg:uninstall(name)
     formula:uninstall(_ENV, self)
     installed[name] = nil
     ccpkg:updatePkgJson(pkg)
-    log(colors.lime, "Removed "..name.." successfully")
+    log(colors.green, name.." has been removed successfully")
 end
 
 
