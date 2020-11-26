@@ -1,19 +1,23 @@
 local json = require("JSON")
 local lfs = require("lfs")
 
+local output = {}
+
 function attrdir (path)
     for file in lfs.dir(path) do
         if file ~= "." and file ~= ".." then
             local f = path..'/'..file
             print ("\t "..f)
-            local attr = lfs.attributes (f)
-            assert (type(attr) == "table")
-            if attr.mode == "directory" then
-                attrdir (f)
-            else
-                for name, value in pairs(attr) do
-                    print (name, value)
+            local func, err = load(f)
+            if func then
+                local ok, f = pcall(func)
+                if ok then
+                    print(f.name)
+                else
+                    error("Could not execute formula")
                 end
+            else
+                error("Could not compile formula")
             end
         end
     end
