@@ -18,13 +18,11 @@
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
 
-title: Your awesome title
+title: ccpkg
 email: your-email@example.com
 description: >- # this means to ignore newlines until "baseurl:"
-  Write an awesome description for your new site here. You can edit this
-  line in _config.yml. It will appear in your document head meta (for
-  Google search results) and in your feed.xml site description.
-baseurl: "/" # the subpath of your site, e.g. /blog
+  The package manager for ComputerCraft.
+baseurl: "" # the subpath of your site, e.g. /blog
 url: "https://gibbo3771.github.io" # the base hostname & protocol for your site, e.g. http://example.com
 twitter_username: jekyllrb
 github_username: jekyll
@@ -33,6 +31,22 @@ github_username: jekyll
 # theme: jekyll-theme-cayman
 plugins:
   - jekyll-feed
+  - jekyll-datapage-generator
+
+page_gen-dirs: true
+
+page_gen:
+  - data: "masterfile"
+    template: "formula"
+    dir: "formula"
+    index_files: false
+    name: "name"
+    title: "name"
+    # title_expr:
+    #   [a Ruby expression to generate the filename (alternative to title)]
+    # extension: [extension used to generate the filename]
+    # filter: [property to filter data records by]
+    # filter_condition: [a Ruby expression to filter data]
 # Exclude from processing.
 # The following items will not be processed, by default.
 # Any item listed under the `exclude:` key here will be automatically added to

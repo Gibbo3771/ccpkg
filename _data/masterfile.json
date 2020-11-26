@@ -1,0 +1,20 @@
+[
+  {
+    "repository": "https://github.com/Gibbo3771/mbs",
+    "name": "mbs",
+    "homepage": "https://github.com/Gibbo3771/mbs",
+    "description": "MBS is a series of utilities for improving the default CraftOS experience."
+  },
+  {
+    "repository": "https://github.com/Gibbo3771/ccpkg-hello-world",
+    "name": "ccpkg-hello-world",
+    "homepage": "https://github.com/Gibbo3771/ccpkg-hello-world",
+    "description": "This is an example formula"
+  },
+  {
+    "repository": "https://github.com/Gibbo3771/cash",
+    "name": "cash",
+    "homepage": "https://github.com/Gibbo3771/cash",
+    "description": "A Bourne-compatible shell for ComputerCraft."
+  }
+]
