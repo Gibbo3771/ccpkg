@@ -12,17 +12,17 @@ function attrdir (path)
             local content = fh:read("*all")
             fh:close()
             print(content)
---            local func, err = load(content)
---            if func then
---                local ok, f = pcall(func)
---                if ok then
---                    print(f.name)
---                else
---                    error("Could not execute formula")
---                end
---            else
---                error("Could not compile formula")
---            end
+            local func, err = load(content)
+            if func then
+                local ok, f = pcall(func)
+                if ok then
+                    print(f.name)
+                else
+                    error("Could not execute formula")
+                end
+            else
+                error("Could not compile formula")
+            end
         end
     end
 end
