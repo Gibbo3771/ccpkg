@@ -32,4 +32,5 @@ local function iterateFolder(path)
 end
 
 iterateFolder("./formula")
-print(json.encode(output, { indent = true }))
+local fh = assert(io.open("./masterfile.json", "w"))
+fh:write(json.encode(output, { indent = true }))
