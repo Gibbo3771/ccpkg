@@ -37,9 +37,6 @@ jobs:
             cd lua-5.4.1
             make linux test
             sudo make install
-            sudo apt-get install -y luarocks
-            sudo luarocks install json-lua
-            sudo luarocks install luafilesystem
             
       - name: Build Luarocks
         run: |
