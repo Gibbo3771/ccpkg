@@ -13,6 +13,8 @@ Features are being put in quite frequently, so far we support the following oper
 * Package versioning (no auto diffing)
 * Startup configuration to autoload paths
 * Package caching
+* Master list maintained via CI
+* List and search commands
 * Colored output and extensive logging
 
 &nbsp;
@@ -25,7 +27,6 @@ There is quite a few things missing that I want to get around to doing.
 * Pre and Post installation hooks
 * Resolve dependencies
 * Additional fields in formula such as liscence, email, contributors etc
-* Master list maintained via CI
 * Query said master list to provide autocomplete functions 
 
 &nbsp;
