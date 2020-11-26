@@ -31,7 +31,6 @@ local workingDir = "/ccpkg/"
 local cachePath = workingDir.."cache/"
 local tmpPath = workingDir.."tmp/"
 local supportedFileTypes = { ".tar.gz" }
-local color = term.isColor();
 local masterfileUrl = "https://gist.githubusercontent.com/Gibbo3771/016d79e59aa38c80b5deff881455d22f/raw/masterfile.json"
 
 local PACKAGE_INSTALLED = 1
