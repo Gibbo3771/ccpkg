@@ -38,7 +38,7 @@ local PACKAGE_INSTALLED = 1
 local PACKAGE_VERSION_MISMATCH = 2
 
 local function log(color, message, inline)
-    if(color) then
+    if(term.isColor()) then
         local oc = term.getTextColor()
         term.setTextColor(color)
         if(not inline) then print(message) else write(message) end
@@ -48,14 +48,8 @@ local function log(color, message, inline)
     end
 end
 
--- Check if the current folder is a valid project directory
--- @returns
-local function isProjectFolder()
-    return fs.exists(path.."/pkg.json")
-end
-
 local function split(s, delimiter)
-    result = {};
+    local result = {};
     for match in (s..delimiter):gmatch("(.-)"..delimiter) do
         table.insert(result, match);
     end
@@ -334,7 +328,6 @@ if(command == "install") then
 elseif(command == "remove") then
     local package = params[2]
     local p = ccpkg:isInstalled(package)
-    local name, version = unpack(splitIntoNameAndVersion(package))
     if(p ~= 0) then
         ccpkg:uninstall(package)
         log(colors.lime, "Finished!")
@@ -344,7 +337,7 @@ elseif(command == "remove") then
     return
 elseif(command == "search") then
     local package = params[2]
-    local name, version = unpack(splitIntoNameAndVersion(package))
+    local name, _ = unpack(splitIntoNameAndVersion(package))
     ccpkg:updateMasterfile()
     ccpkg:search(name)
     return
