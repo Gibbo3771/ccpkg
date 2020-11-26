@@ -1,6 +1,4 @@
-# This is a basic workflow to help you get started with Actions
-
-name: CI
+name: Generate Masterfile
 
 # Controls when the action will run. 
 on:
@@ -11,19 +9,12 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
   build:
-    # The type of runner that the job will run on
     runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
-      # Runs a single command using the runners shell
       - name: Install build dependencies
         run: |
             sudo apt-get update -y
@@ -54,9 +45,23 @@ jobs:
             
       - name: Generate JSON output
         run: lua generate-master-file.lua && cat masterfile.json
+        uses: actions/upload-artifact@v2
+        with:
+          name: masterfile
+          path: masterfile.json
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: masterfile
+          path: ./masterfile.json
+      - name: Upload to Gist
+        uses: exuanbo/actions-deploy-gist@v1.0.3
+        with:
+          token: ${{ secrets.GIST_TOKEN }}
+          gist_id: 016d79e59aa38c80b5deff881455d22f
+          gist_file_name: masterfile.json
+          file_path: ./masterfile.json
 
-#      # Runs a set of commands using the runners shell
-#      - name: Run a multi-line script
-#        run: |
-#          echo Add other actions to build,
-#          echo test, and deploy your project.
