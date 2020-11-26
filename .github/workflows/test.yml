@@ -60,7 +60,8 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: masterfile
-          path: ./masterfile.json
+      - name: Log folder
+        run: ls
       - name: Upload to Gist
         uses: exuanbo/actions-deploy-gist@v1.0.3
         with:
