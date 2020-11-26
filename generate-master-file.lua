@@ -1,8 +1,9 @@
 local json = require ("dkjson")
 local lfs = require("lfs")
 
+local output = {}
+
 local function iterateFolder(path)
-    local output = {}
     for file in lfs.dir(path) do
         if file ~= "." and file ~= ".." then
             local f = path..'/'..file
@@ -14,7 +15,12 @@ local function iterateFolder(path)
             if func then
                 local ok, formula = pcall(func)
                 if ok then
-                    table.insert(output, formula)
+                    table.insert(output, {
+                        name = formula.name,
+                        description = formula.description,
+                        homepage = formula.homepage,
+                        repository = formula.repository
+                    })
                 else
                     error("Could not execute formula")
                 end
@@ -25,6 +31,5 @@ local function iterateFolder(path)
     end
 end
 
-local output = iterateFolder("./formula")
+iterateFolder("./formula")
 print(json.encode(output, { indent = true }))
-
