@@ -49,7 +49,7 @@ jobs:
             
       - name: Install Lua dependenices
         run: |
-            sudo luarocks install json-lua
+            sudo luarocks install dkjson
             sudo luarocks install luafilesystem
             
       - name: Generate JSON output

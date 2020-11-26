@@ -1,4 +1,4 @@
-local json = require("JSON")
+local json = require ("dkjson")
 local lfs = require("lfs")
 
 local function iterateFolder(path)
@@ -26,5 +26,5 @@ local function iterateFolder(path)
 end
 
 local output = iterateFolder("./formula")
-print(json:encode(output))
+print(json.encode(output, { indent = true }))
 
