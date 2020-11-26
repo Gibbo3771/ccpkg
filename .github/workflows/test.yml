@@ -50,7 +50,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: masterfile
-          path: masterfile.json
+          path: ./
           
   deploy:
     needs: build
@@ -67,5 +67,5 @@ jobs:
           token: ${{ secrets.GIST_TOKEN }}
           gist_id: 016d79e59aa38c80b5deff881455d22f
           gist_file_name: masterfile.json
-          file_path: masterfile.json
+          file_path: ./masterfile.json
 
