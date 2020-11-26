@@ -8,7 +8,7 @@ function attrdir (path)
         if file ~= "." and file ~= ".." then
             local f = path..'/'..file
             print ("\t "..f)
-            local fh = assert(io.open(f, "r"))
+            local fh = assert(io.open(f, "rb"))
             local content = fh:read("*all")
             fh:close()
             local func, err = load(content)
