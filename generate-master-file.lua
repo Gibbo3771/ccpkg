@@ -18,10 +18,15 @@ local function iterateFolder(path)
                 local ok, formula = pcall(func)
                 if ok then
                     table.insert(output.packages, {
-                        name = formula.name,
-                        description = formula.description,
-                        homepage = formula.homepage,
-                        repository = formula.repository
+                        pkg_name = formula.name,
+                        pkg_description = formula.description,
+                        pkg_homepage = formula.homepage,
+                        pkg_repository = formula.repository,
+                        pkg_authors = formula.authors,
+                        pkg_license = formula.license,
+                        pkg_target = formula.target,
+                        pkg_versions = formula.versions,
+                        pkg_stableVersion = formula.stable()
                     })
                 else
                     error("Could not execute formula")
