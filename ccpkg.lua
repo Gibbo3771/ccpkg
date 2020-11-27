@@ -288,7 +288,7 @@ end
 -- List all packages
 -- @param name the name of the package
 function ccpkg:list()
-    log(colors.organge, "All packages")
+    log(colors.orange, "All packages")
     local pkg = ccpkg:parsePkgJson()
     local installed = pkg.installed
     local masterfile = ccpkg:parseMasterfile()
