@@ -27,6 +27,11 @@ url: "https://gibbo3771.github.io" # the base hostname & protocol for your site,
 twitter_username: jekyllrb
 github_username: jekyll
 theme: jekyll-theme-cayman
+github:
+  repository_url: https://github.com/Gibbo3771/ccpkg
+  repository_name: ccpkg
+  owner_url: https://github.com/Gibbo3771
+  owner_name: Gibbo3771
 
 # Build settings
 # theme: jekyll-theme-cayman
