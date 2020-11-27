@@ -47,7 +47,7 @@ page_gen:
     dir: "f"
     index_files: false
     title: "name"
-    name_expr: "name"
+    name: "name"
     page_data_prefix: "pkg"
     # title_expr:
     #   [a Ruby expression to generate the filename (alternative to title)]
