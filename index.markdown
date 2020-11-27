@@ -16,7 +16,7 @@ layout: default
 wget run https://raw.githubusercontent.com/Gibbo3771/ccpkg/main/install.lua
 ```
 
-Get started by [browsing the package repository]({{ "/formula" | relative_url }}) or install the [example package]({{ "/formula/ccpkg-hello-world" | relative_url }})
+Get started by [browsing the package repository]({{ "/formula" | absolute_url }}) or install the [example package]({{ "/formula/ccpkg-hello-world" | absolute_url }})
 
 ## Features
 
