@@ -34,15 +34,16 @@ plugins:
   - jekyll-feed
   - jekyll-datapage-generator
 
-page_gen-dirs: true
+# page_gen-dirs: true
 
 page_gen:
   - data: "masterfile"
     template: "formula"
-    dir: "formula"
+    dir: ""
     index_files: false
-    name: "pkg_name"
-    title: "pkg_name"
+    title: "name"
+    name_expr: "'f_' + record['name']"
+    page_data_prefix: "pkg"
     # title_expr:
     #   [a Ruby expression to generate the filename (alternative to title)]
     # extension: [extension used to generate the filename]
