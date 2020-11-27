@@ -6,7 +6,7 @@ layout: default
 
 Adding your own packages to the repository is easy. If you are familiar with Github forking and Pull Requests, you can get going in just a few minutes.
 
-You will require knowledge of ComputerCraft, as each **formula** works by exposing an **install** and **uninstall** hook. These are called by `ccpkg` once your package has been extrated to an artifact directory.
+You will require knowledge of ComputerCraft, as each **formula** works by exposing an **install** and **uninstall** hook. These are called by `ccpkg` once your package has been extracted to an artifact directory.
 
 ### Formula
 

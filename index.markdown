@@ -5,53 +5,13 @@ layout: default
 **ccpkg** is a package manager specifically created for ComputerCraft (CC) that allows a centralized distribution source for vetted libaries, programs and command-line tools. Anyone can contiribute to the central repository, and anyone can explore and use it.
 {: .text--center .padding-top--4}
 
-## Get started
+## Install ccpkg
+{: .text--center}
 
-### Installation
-
-```sh
+```python
 wget run https://raw.githubusercontent.com/Gibbo3771/ccpkg/main/install.lua
 ```
+{: .text--center}
 
-Get started by [browsing the package repository]({{ "/formula" | absolute_url }}) or install the [example package]({{ "f/ccpkg-hello-world" | relative_url }})
 
-## Features
-
-- Add and remove packages using formula definitions
-- Package versioning
-- Startup configuration to autoload paths
-- Package caching
-- List and search commands
-- Colored output and extensive logging
-
-## Commands
-
-#### Installing a package
-
-```sh
-ccpkg install <package-name>
-```
-
-#### Removing a package
-
-```sh
-ccpkg remove <package-name>
-```
-
-#### Search for a package by name
-
-```sh
-ccpkg search <package-name>
-```
-
-#### List all packages
-
-Lists all the available packages. (This list could get pretty long, maybe install the [mbs]({{ "f/mbs" | relative_url }}) package to allow scrolling)
-
-```sh
-ccpkg list
-```
-
-## Contributing
-
-Got a package you want to add? Head over to the [documentation]({{ "/contributing" | relative_url }}) to learn how.
+{% include search.html %}
