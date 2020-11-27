@@ -44,10 +44,10 @@ plugins:
 page_gen:
   - data: "masterfile"
     template: "formula"
-    dir: ""
+    dir: "f"
     index_files: false
     title: "name"
-    name_expr: "'f_' + record['name']"
+    name_expr: "name"
     page_data_prefix: "pkg"
     # title_expr:
     #   [a Ruby expression to generate the filename (alternative to title)]
