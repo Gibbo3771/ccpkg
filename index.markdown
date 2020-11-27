@@ -16,7 +16,7 @@ layout: default
 wget run https://raw.githubusercontent.com/Gibbo3771/ccpkg/main/install.lua
 ```
 
-Get started by [browsing the package repository]({{ "/formula" | absolute_url }}) or install the [example package]({{ "ccpkg-hello-world" | datapage_url: "formula" }})
+Get started by [browsing the package repository]({{ "/formula" | absolute_url }}) or install the [example package]({{ "/formula/ccpkg-hello-world" | absolute_url }})
 
 ## Features
 
@@ -49,7 +49,7 @@ ccpkg search <package-name>
 
 #### List all packages
 
-Lists all the available packages. (This list could get pretty long, maybe install the [mbs]({{ "mbs" | datapage_url: "formula"  }}) package to allow scrolling)
+Lists all the available packages. (This list could get pretty long, maybe install the [mbs]({{ "/formula/mbs" | relative_url }}) package to allow scrolling)
 
 ```sh
 ccpkg list
