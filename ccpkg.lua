@@ -268,8 +268,8 @@ function ccpkg:search(name)
     local installed = pkg.installed
     local version = installed[name]
     local masterfile = ccpkg:parseMasterfile()
-    for _, package in pairs(masterfile.packages) do
-        if(package.name == name) then
+    for _, e in pairs(masterfile) do
+        if(e.pkg_name == name) then
             local version = installed[name]
             local i = ""
             if(version) then i = "(installed)" end
@@ -277,7 +277,7 @@ function ccpkg:search(name)
             log(colors.yellow, "Name: ", true)
             log(colors.white, name.." "..i)
             log(colors.yellow, "Description: ", true)   
-            log(colors.white, package.description)
+            log(colors.white, e.pkg_description)
             log(colors.blue, "------------------------------------------")
             return
         end
@@ -292,20 +292,20 @@ function ccpkg:list()
     local pkg = ccpkg:parsePkgJson()
     local installed = pkg.installed
     local masterfile = ccpkg:parseMasterfile()
-    for _, package in pairs(masterfile.packages) do
+    for _, e in pairs(masterfile) do
         local i = ""
         for n, _ in pairs(installed) do
-            if(n == package.name) then i = "(installed)" end
+            if(n == e.pkg_name) then i = "(installed)" end
         end
         log(colors.blue, "------------------------------------------")
         log(colors.yellow, "Name: ", true)
-        log(colors.white, package.name.." "..i)
+        log(colors.white, e.pkg_name.." "..i)
         log(colors.yellow, "Description: ", true)   
-        log(colors.white, package.description)
+        log(colors.white, e.pkg_description)
     end
     log(colors.blue, "------------------------------------------")
     log(colors.yellow, "Total packages: ", true)
-    log(colors.white, table.getn(masterfile.packages))
+    log(colors.white, table.getn(masterfile))
 
 end
 

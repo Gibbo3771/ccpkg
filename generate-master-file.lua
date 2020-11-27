@@ -2,7 +2,6 @@ local json = require ("dkjson")
 local lfs = require("lfs")
 
 local output = {
-    packages = {}
 }
 
 local function iterateFolder(path)
@@ -17,7 +16,7 @@ local function iterateFolder(path)
             if func then
                 local ok, formula = pcall(func)
                 if ok then
-                    table.insert(output.packages, {
+                    table.insert(output, {
                         pkg_name = formula.name,
                         pkg_description = formula.description,
                         pkg_homepage = formula.homepage,
