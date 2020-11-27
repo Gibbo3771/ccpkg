@@ -41,8 +41,8 @@ page_gen:
     template: "formula"
     dir: "formula"
     index_files: false
-    name: "name"
-    title: "name"
+    name: "pkg_name"
+    title: "pkg_name"
     # title_expr:
     #   [a Ruby expression to generate the filename (alternative to title)]
     # extension: [extension used to generate the filename]

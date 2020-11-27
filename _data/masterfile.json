@@ -1,20 +1,41 @@
 [
   {
-    "repository": "https://github.com/Gibbo3771/mbs",
-    "name": "mbs",
-    "homepage": "https://github.com/Gibbo3771/mbs",
-    "description": "MBS is a series of utilities for improving the default CraftOS experience."
+    "pkg_license": "MIT",
+    "pkg_authors": ["Jonathan Coates"],
+    "pkg_description": "MBS is a series of utilities for improving the default CraftOS experience.",
+    "pkg_versions": {
+      "1.0.0": "https://github.com/Gibbo3771/mbs/archive/1.0.0.tar.gz"
+    },
+    "pkg_name": "mbs",
+    "pkg_repository": "https://github.com/Gibbo3771/mbs",
+    "pkg_stableVersion": "1.0.0",
+    "pkg_homepage": "https://github.com/Gibbo3771/mbs"
   },
   {
-    "repository": "https://github.com/Gibbo3771/ccpkg-hello-world",
-    "name": "ccpkg-hello-world",
-    "homepage": "https://github.com/Gibbo3771/ccpkg-hello-world",
-    "description": "This is an example formula"
+    "pkg_target": "*",
+    "pkg_license": "MIT",
+    "pkg_authors": ["Stephen Gibson"],
+    "pkg_description": "This is an example formula",
+    "pkg_versions": {
+      "2.0.0": "https://github.com/Gibbo3771/ccpkg-hello-world/archive/2.0.0.tar.gz",
+      "3.0.0": "https://github.com/Gibbo3771/ccpkg-hello-world/archive/3.0.0.tar.gz",
+      "1.0.0": "https://github.com/Gibbo3771/ccpkg-hello-world/archive/1.0.0.tar.gz"
+    },
+    "pkg_name": "ccpkg-hello-world",
+    "pkg_repository": "https://github.com/Gibbo3771/ccpkg-hello-world",
+    "pkg_stableVersion": "3.0.0",
+    "pkg_homepage": "https://github.com/Gibbo3771/ccpkg-hello-world"
   },
   {
-    "repository": "https://github.com/Gibbo3771/cash",
-    "name": "cash",
-    "homepage": "https://github.com/Gibbo3771/cash",
-    "description": "A Bourne-compatible shell for ComputerCraft."
+    "pkg_license": "MIT",
+    "pkg_authors": ["MCJack123"],
+    "pkg_description": "A Bourne-compatible shell for ComputerCraft.",
+    "pkg_versions": {
+      "0.3.0": "https://github.com/Gibbo3771/cash/archive/0.3.0.tar.gz"
+    },
+    "pkg_name": "cash",
+    "pkg_repository": "https://github.com/Gibbo3771/cash",
+    "pkg_stableVersion": "0.3.0",
+    "pkg_homepage": "https://github.com/Gibbo3771/cash"
   }
 ]

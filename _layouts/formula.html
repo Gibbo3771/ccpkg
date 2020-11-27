@@ -4,12 +4,36 @@
 
 layout: default
 ---
-<h2>{{ page.title }}</h2>
-<p>{{ page.description }}</p>
+<h2>{{ page.pkg_name }}</h2>
+<p>{{ page.pkg_description }}</p>
 <h4>Install
 </h4>
 <div class="language-sh highlighter-rouge">
   <div class="highlight">
-    <pre class="highlight"><code>ccpkg install {{ page.title }}</code></pre>
+    <pre class="highlight"><code>ccpkg install {{ page.pkg_name }}</code></pre>
   </div>
 </div>
+<h4>License</h4>
+<span>{{ page.pkg_license }}</span>
+<h4>Authors</h4>
+<ul>
+  {% for author in page.pkg_authors %}
+    <li>{{ author }}</li>
+  {% endfor %}
+</ul>
+<h4>Homepage</h4>
+<a href="{{ page.pkg_homepage }}">{{ page.pkg_homepage }}</a>
+<h4>Repository</h4>
+<a href="{{ page.pkg_repository }}">{{ page.pkg_repository }}</a>
+
+<h4>Versions</h4>
+<ul>
+  {% for version in page.pkg_versions %}
+    <li>
+      <a href="{{ version[1] }}">{{ version[0] }}</a>
+      {% if version[0] == page.pkg_stableVersion %}
+        (✅ current)
+      {% endif %}
+    </li>
+  {% endfor %}
+</ul>
