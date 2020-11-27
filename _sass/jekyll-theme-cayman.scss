@@ -1,8 +1,16 @@
 @import "normalize";
-@import "rouge-github";
+@import "rouge";
 @import "variables";
 @import "utils";
-@import url("https://fonts.googleapis.com/css?family=Open+Sans:400,700");
+@import url("https://fonts.googleapis.com/css2?family=Source+Code+Pro&family=Space+Mono&display=swap");
+@font-face {
+  font-family: "Minecraft";
+  src: url("../fonts/Minecraft.ttf");
+}
+@font-face {
+  font-family: "EarlyGameBoy";
+  src: url("../fonts/EarlyGameBoy.ttf");
+}
 
 @mixin large {
   @media screen and (min-width: #{$large-breakpoint}) {
@@ -29,10 +37,11 @@
 body {
   padding: 0;
   margin: 0;
-  font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Source Code Pro", monospace;
   font-size: 16px;
   line-height: 1.5;
   color: $body-text-color;
+  background: $body-bg-color;
 }
 
 a {
@@ -41,6 +50,13 @@ a {
 
   &:hover {
     text-decoration: underline;
+  }
+}
+
+.no-style-link {
+  text-decoration: none;
+  &:hover {
+    text-decoration: none;
   }
 }
 
@@ -90,6 +106,7 @@ a {
 
 .page-header {
   color: $header-heading-color;
+  font-family: Minecraft;
   text-align: center;
   background-color: $header-bg-color;
   background-image: linear-gradient(
@@ -99,24 +116,25 @@ a {
   );
 
   @include large {
-    padding: 5rem 6rem;
+    padding: 3rem 6rem;
   }
 
   @include medium {
-    padding: 3rem 4rem;
+    padding: 2rem 4rem;
   }
 
   @include small {
-    padding: 2rem 1rem;
+    padding: 1rem 1rem;
   }
 }
 
 .project-name {
   margin-top: 0;
   margin-bottom: 0.1rem;
+  letter-spacing: 5px;
 
   @include large {
-    font-size: 3.25rem;
+    font-size: 4.5rem;
   }
 
   @include medium {
@@ -132,6 +150,7 @@ a {
   margin-bottom: 2rem;
   font-weight: normal;
   opacity: 0.7;
+  letter-spacing: 3px;
 
   @include large {
     font-size: 1.25rem;
@@ -180,10 +199,20 @@ a {
   h4,
   h5,
   h6 {
-    margin-top: 2rem;
+    margin-top: 4rem;
     margin-bottom: 1rem;
     font-weight: normal;
     color: $section-headings-color;
+    font-family: Minecraft;
+  }
+
+  h3 {
+    letter-spacing: 3px;
+    margin-top: 0rem;
+  }
+
+  h4 {
+    margin-top: 0;
   }
 
   p {

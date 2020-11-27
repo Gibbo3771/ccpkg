@@ -5,14 +5,10 @@
 layout: default
 ---
 
-&nbsp;
-
 **ccpkg** is a package manager specifically created for ComputerCraft (CC) that allows a centralized distribution source for vetted libaries, programs and command-line tools. Anyone can contiribute to the central repository, and anyone can explore and use it.
 {: .text--center}
 
 ## Get started
-
----
 
 ### Installation
 
@@ -20,62 +16,46 @@ layout: default
 wget run https://raw.githubusercontent.com/Gibbo3771/ccpkg/main/install.lua
 ```
 
-### Install packages
-
-Get started by [browsing the package repository](https://github.com/Gibbo3771/CC-Tweaked) or install the [example package](#example)
+Get started by [browsing the package repository]({{ "/formula" | relative_url }}) or install the [example package]({{ "/formula/ccpkg-hello-world" | relative_url }})
 
 ## Features
 
----
-
 - Add and remove packages using formula definitions
-- Package versioning (no auto diffing)
+- Package versioning
 - Startup configuration to autoload paths
 - Package caching
 - List and search commands
 - Colored output and extensive logging
 
-&nbsp;
-
-### Example
-
-{: #example}
-
-You can see an example by following the commands below:
-
-```sh
-ccpkg install ccpkg-hello-world
-```
-
-Once installation is complete, you can run `say-hello` from your terminal
-
-&nbsp;
-
 ## Commands
-
----
 
 #### Installing a package
 
-`ccpkg install <package-name>`
+```sh
+ccpkg install <package-name>
+```
 
 #### Removing a package
 
-`ccpkg remove <package-name>`
+```sh
+ccpkg remove <package-name>
+```
 
 #### Search for a package by name
 
-`ccpkg search <package-name>`
+```sh
+ccpkg search <package-name>
+```
 
 #### List all packages
 
-Lists all the available packages. (This list could get pretty long, maybe install the `mbs` package to allow scrolling)
+Lists all the available packages. (This list could get pretty long, maybe install the [mbs]({{ "/formula/mbs" | relative_url }}) package to allow scrolling)
 
-`ccpkg list`
+```sh
+ccpkg list
+```
 
-&nbsp;
-
-### Formula
+## Formula
 
 The anatomy of a Formula file, comments explain each section. This formula has been taken from the `ccpkh-hello-world` formula:
 
@@ -143,8 +123,6 @@ end
 return package  -- [REQUIRED] Always return your package table
 ```
 
-&nbsp;
-
 ### Creating a Formula
 
 First off, fork this repository. Direct commits are not permitted.
@@ -158,15 +136,11 @@ Follow the above anatomy to create your formula properly. Here are criteria each
 
 Once you are happy, create a PR with your Formula. If you are keeping your packages up to date and are active, you will be given the ability to merge your own PR.
 
-&nbsp;
-
 ### Caveats
 
 Lots. There is some modification of `package.path` and what not, and I am not sure on the side effects or weirdness you will get with my implementation of the path resolution. I didn't realise `shell.resolve` was a thing!
 
 My only package sucks.
-
-&nbsp;
 
 ## NOTE
 
