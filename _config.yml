@@ -33,7 +33,6 @@ theme: jekyll-theme-cayman
 plugins:
   - jekyll-feed
   - jekyll-datapage-generator
-  - jekyll-include-cache
 
 page_gen-dirs: true
 
