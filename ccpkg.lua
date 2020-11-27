@@ -269,7 +269,7 @@ function ccpkg:search(name)
     local version = installed[name]
     local masterfile = ccpkg:parseMasterfile()
     for _, e in pairs(masterfile) do
-        if(e.pkg_name == name) then
+        if(e.name == name) then
             local version = installed[name]
             local i = ""
             if(version) then i = "(installed)" end
@@ -277,7 +277,7 @@ function ccpkg:search(name)
             log(colors.yellow, "Name: ", true)
             log(colors.white, name.." "..i)
             log(colors.yellow, "Description: ", true)   
-            log(colors.white, e.pkg_description)
+            log(colors.white, e.description)
             log(colors.blue, "------------------------------------------")
             return
         end
@@ -295,13 +295,13 @@ function ccpkg:list()
     for _, e in pairs(masterfile) do
         local i = ""
         for n, _ in pairs(installed) do
-            if(n == e.pkg_name) then i = "(installed)" end
+            if(n == e.name) then i = "(installed)" end
         end
         log(colors.blue, "------------------------------------------")
         log(colors.yellow, "Name: ", true)
-        log(colors.white, e.pkg_name.." "..i)
+        log(colors.white, e.name.." "..i)
         log(colors.yellow, "Description: ", true)   
-        log(colors.white, e.pkg_description)
+        log(colors.white, e.description)
     end
     log(colors.blue, "------------------------------------------")
     log(colors.yellow, "Total packages: ", true)
