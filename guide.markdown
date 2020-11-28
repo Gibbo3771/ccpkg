@@ -3,8 +3,12 @@ layout: default
 ---
 
 # Guide
+---
+
+In this guide you will learn how to use ccpkg, as well as contribute a package to the repository.
 
 {% include table-of-contents.html %}
+
 
 ### Commands
 {: #commands}
@@ -223,4 +227,7 @@ function package:uninstall(env, ccpkg, version)
 end
 ```
 
-Once you are happy, you can create a PR for your formula that merges in the `main` branch. It will be reviewed and merged in, and your formula will be available to download and to view on the website.
+### Create PR
+{: #contrib_create_pr}
+
+Once you are happy, you can create a PR for your formula that merges in the `main` branch. It will be reviewed and then approved, and your formula will be available to use and view on the website.

@@ -12,9 +12,8 @@
     <div>
       <nav>
         <ul>
-          <a href={{ site.baseurl | relative_url }}><li>home</li></a>
-          <a href={{ "guide" | relative_url }}><li>guide</li></a>
-          <a href={{ "contributing" | relative_url }}><li>contributing</li></a>
+          <a href={{ site.baseurl | relative_url }} class="{% if page.url == '/' %}active{% endif %}"><li>home</li></a>
+          <a href={{ "guide" | relative_url }} class="{% if page.url == '/guide.html' %}active{% endif %}"><li>guide</li></a>
           <a href={{ site.github.repository_url }}>
             <li>
               <div class="github-logo-wrapper">

@@ -172,10 +172,6 @@ a {
 .main-content {
   word-wrap: break-word;
 
-  :first-child {
-    margin-top: 0;
-  }
-
   @include large {
     max-width: 64rem;
     padding: 2rem 6rem;
@@ -221,7 +217,11 @@ a {
   }
 
   h5 {
-    margin-top: 0;
+    margin-top: 0.5em;
+  }
+
+  h6 {
+    margin-top: 0.25em;
   }
 
   p {
@@ -364,9 +364,10 @@ a {
   }
 
   hr {
-    height: 2px;
+    height: 5px;
     padding: 0;
-    margin: 1rem 0;
+    margin: 0.1rem 0;
+    margin-bottom: 2em;
     background-color: $hr-border-color;
     border: 0;
   }
@@ -378,6 +379,13 @@ nav {
   background: $header-bg-color;
   font-weight: 800;
   font-size: 1.1em;
+  font-family: Minecraft;
+  letter-spacing: 2px;
+
+  .active {
+    text-decoration: underline;
+  }
+
   ul {
     padding: 0;
     margin: 0;
@@ -421,8 +429,18 @@ nav {
   }
 }
 
-.nav-active {
-  color: blue;
+.guide-contents {
+  a {
+    color: $body-text-color;
+    
+    &:hover {
+      color: $body-link-color;
+    }
+  }
+}
+
+.blurb {
+  padding: 2em 1em;
 }
 
 .github-logo {
