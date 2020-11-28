@@ -1,4 +1,9 @@
 <div class="search">
-   
-  <input id="search"/>
+  <label for="search">search packages</label>
+  <input id="search" type="text"/>
+  <table id="search-result-list">
+    <!-- Filled by search results -->
+  </table>
 </div>
+<script src="https://unpkg.com/lunr/lunr.js"></script>
+<script src="{{ base.url | prepend: site.url }}/assets/js/package-search.js"></script>

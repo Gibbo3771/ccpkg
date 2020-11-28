@@ -1,5 +1,12 @@
 .search {
   padding: 3em 0;
+
+  label {
+    font-family: Minecraft;
+    color: $section-headings-color;
+    letter-spacing: 2px;
+  }
+
   input {
     -webkit-appearance: none;
     border: none;
@@ -7,5 +14,27 @@
     background: $header-bg-color;
     border-radius: 4px;
     width: 100%;
+  }
+
+  table {
+    margin-top: 2em;
+    
+    tr {
+      &:nth-child(2){
+        background: $header-bg-color;
+      }
+
+      a {
+        cursor: pointer;
+      }
+
+      .name {
+        width: 35%;
+      }
+
+      .description {
+        width: 65%;
+      }
+    }
   }
 }

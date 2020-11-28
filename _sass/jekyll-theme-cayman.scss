@@ -48,10 +48,13 @@ body {
 a {
   color: $body-link-color;
   text-decoration: none;
+  transition: color ease-in 0.1s;
 
   &:hover {
-    text-decoration: underline;
+    color: lighten($body-link-color, 20%);
+    transition: color ease-out 0.1s;
   }
+
 }
 
 .no-style-link {
@@ -117,7 +120,7 @@ a {
   );
 
   @include large {
-    padding: 3rem 6rem;
+    padding: 2rem 6rem;
   }
 
   @include medium {
@@ -210,11 +213,15 @@ a {
 
   h3 {
     letter-spacing: 3px;
-    margin-top: 1em;
+    margin-top: 2em;
   }
 
   h4 {
-    margin-top: 1.25em;
+    margin-top: 1.5em;
+  }
+
+  h5 {
+    margin-top: 0;
   }
 
   p {
@@ -323,7 +330,6 @@ a {
   }
 
   table {
-    display: block;
     width: 100%;
     overflow: auto;
     word-break: normal;
@@ -367,9 +373,11 @@ a {
 }
 
 nav {
-  padding: 0em;
+  padding: 0.5em;
   color: $body-link-color;
-  background: $border-color;
+  background: $header-bg-color;
+  font-weight: 800;
+  font-size: 1.1em;
   ul {
     padding: 0;
     margin: 0;
@@ -393,9 +401,10 @@ nav {
     }
     a {
       align-self: center;;
+      margin: 0em 0.3em;
       li {
         list-style: none;
-        padding: 0.5em 1em;
+        padding: 0.5em 0.5em;
 
         &::marker {
           content: "";
@@ -406,12 +415,27 @@ nav {
           color: white;
         }
       }
+
+
     }
   }
 }
 
 .nav-active {
   color: blue;
+}
+
+.github-logo {
+  fill: white;
+}
+
+.github-logo-wrapper {
+  display: flex;
+  align-items: center;
+  width: 31px;
+  height: 31px;
+  color: white;
+  cursor: pointer;
 }
 
 .site-footer {

@@ -1,0 +1,37 @@
+[{
+    "homepage":"https://github.com/Gibbo3771/mbs",
+    "name":"mbs",
+    "stableVersion":"1.0.0",
+    "description":"MBS is a series of utilities for improving the default CraftOS experience.",
+    "repository":"https://github.com/Gibbo3771/mbs",
+    "versions":{
+      "1.0.0":"https://github.com/Gibbo3771/mbs/archive/1.0.0.tar.gz"
+    },
+    "authors":["Jonathan Coates"],
+    "license":"MIT"
+  },{
+    "homepage":"https://github.com/Gibbo3771/ccpkg-hello-world",
+    "name":"ccpkg-hello-world",
+    "stableVersion":"3.0.0",
+    "description":"This is an example formula",
+    "repository":"https://github.com/Gibbo3771/ccpkg-hello-world",
+    "versions":{
+      "1.0.0":"https://github.com/Gibbo3771/ccpkg-hello-world/archive/1.0.0.tar.gz",
+      "2.0.0":"https://github.com/Gibbo3771/ccpkg-hello-world/archive/2.0.0.tar.gz",
+      "3.0.0":"https://github.com/Gibbo3771/ccpkg-hello-world/archive/3.0.0.tar.gz"
+    },
+    "authors":["Stephen Gibson"],
+    "target":"*",
+    "license":"MIT"
+  },{
+    "homepage":"https://github.com/Gibbo3771/cash",
+    "name":"cash",
+    "stableVersion":"0.3.0",
+    "description":"A Bourne-compatible shell for ComputerCraft.",
+    "repository":"https://github.com/Gibbo3771/cash",
+    "versions":{
+      "0.3.0":"https://github.com/Gibbo3771/cash/archive/0.3.0.tar.gz"
+    },
+    "authors":["MCJack123"],
+    "license":"MIT"
+  }]
