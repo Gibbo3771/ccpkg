@@ -1,4 +1,4 @@
 #!/bin/bash
 
 wget https://gist.githubusercontent.com/Gibbo3771/016d79e59aa38c80b5deff881455d22f/raw/masterfile.json -O _data/masterfile.json
-cp _data/materfile.json assets/masterfile.json
+cp _data/masterfile.json assets/masterfile.json
