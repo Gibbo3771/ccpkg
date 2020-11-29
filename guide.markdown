@@ -3,7 +3,7 @@ layout: default
 ---
 
 # Guide
----
+----
 
 In this guide you will learn how to use ccpkg, as well as contribute a package to the repository.
 
@@ -84,6 +84,19 @@ This is a detailed description of what your package does. It is visible when you
 First start off by forking the [ccpkg]({{ site.github.repository_url }}) respository.
 
 Copy and paste the `ccpkg-hello-world` formula and rename the file to the name of your package. Then fill in the properties as you see fit.
+
+### Folder structure
+{: #contrib_create_fstruct}
+
+#### /ccpkg/bin
+
+ccpkg exposes a single directory, `/ccpkg/bin` to the system `path`, any files placed in here will be available from anywhere.
+Putting your runnable files here will make easy to use without having to worry about setting up extra paths.
+#### /ccpkg/lib
+
+The library folder is a place to put non runnable dependencies that want to expose to other programs. If your
+package is a pure API it should be placed here. You can also put your dependencies here, and reference them by module name and ccpkg will resolve them for you. This means you could have a single script in `/ccpkg/bin` and all your library files in `/ccpkg/lib/my_sexy_package/`, allowing for an easier clean up process
+
 
 ### package:install
 {: #contrib_create_install}
