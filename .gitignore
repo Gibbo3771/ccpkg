@@ -1,3 +1,5 @@
 # These are left over artifacts when switching from 'web' branch
 _site
 .sass-cache
+_data
+assets

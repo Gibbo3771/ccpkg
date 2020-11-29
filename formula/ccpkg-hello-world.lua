@@ -9,8 +9,8 @@ local package = { -- [REQUIRED] The table that ccpkg will require when it downlo
     authors = { "Stephen Gibson" }, -- [OPTIONAL] An array of authors for this package
     contributors = { },  -- [OPTIONAL] An array of contributors to this package
     license = "MIT",  -- [RECOMMENDED] The license that this package lives under
-    library = false,  -- [OPTIONAL] If this package is a library, defaults to false.
-    target = "*", -- [RECOMMENDED] Specify if this package was created for either 'computer', 'turtle' or '*' for any
+    library = false,  -- [OPTIONAL, NOT YET IMPLEMENTED] If this package is a library, defaults to false.
+    target = "*", -- [RECOMMENDED, NOT YET IMPLEMENTED] Specify if this package was created for either 'computer', 'turtle' or '*' for any
     versions = { -- [REQUIRED] A table of the available versions, where the key is the version number and the value is the download url
         ["3.0.0"] = "https://github.com/Gibbo3771/ccpkg-hello-world/archive/3.0.0.tar.gz",
         ["2.0.0"] = "https://github.com/Gibbo3771/ccpkg-hello-world/archive/2.0.0.tar.gz",
@@ -24,35 +24,31 @@ end
 
 -- TODO
 -- This hook is called right before the package is installed
-function package:preInstall(version)  -- [OPTIONAL] A pre install hook
+function package:preInstall(version)  -- [OPTIONAL, NOT YET IMPLEMENTED] A pre install hook
     -- Do some stuff
 end
 
--- This hook is called during the installation of the package, if it
--- exists on the formula, this will be ran instead of ccpkg install
--- code, allowing custom installations
+-- This hook is called during the installation of the package.
 -- @param env the env that the script was executed from
 -- @param ccpkg the ccpkg instance
 -- @param artifacts the directory where the package artifacts are located
 -- @param version the version of the package being installed
-function package:install(env, ccpkg, artifacts, version)  -- [OPTIONAL] An installation hook. Allows custom logic for installation
+function package:install(env, ccpkg, artifacts, version)  -- [REQUIRED]
     -- We move our script into the bin path so it's available globally
     env.fs.move(artifacts.."/say-hello.lua", "/ccpkg/bin/say-hello.lua")
 end
 
 -- TODO
 -- This hook is called right after the package has been installed
-function package:postInstall(version)  -- [OPTIONAL] A post install hook
+function package:postInstall(version)  -- [OPTIONAL, NOT YET IMPLEMENTED] A post install hook
     -- Do some stuff
 end
 
 -- This hook is called during the uninstallation of a package
--- code, allowing custom installations
 -- @param env the env that the script was executed from
 -- @param ccpkg the ccpkg instance
--- @param artifacts the directory where the package artifacts are located
 -- @param version the version of the package being uninstalled
-function package:uninstall(env, ccpkg, artifacts, version)  -- [OPTIONAL] An uninstallation hook. Allows custom logic for uninstallation
+function package:uninstall(env, ccpkg, version)  -- [REQUIRED]
     -- We remove our script
     env.fs.delete("/ccpkg/bin/say-hello.lua")
 
