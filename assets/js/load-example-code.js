@@ -1,7 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
   const formulaBox = document.querySelector("#example-formula");
   if(!formulaBox) return;
-  hljs.initHighlightingOnLoad()
   const url = "https://raw.githubusercontent.com/Gibbo3771/ccpkg/main/formula/ccpkg-hello-world.lua"
   fetch(url)
     .then((r) => r.text())
