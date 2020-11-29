@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  create-materfile:
+  create-masterfile:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -51,7 +51,7 @@ jobs:
           path: ./
           
   update-masterfile-gist:
-    needs: build
+    needs: create-masterfile
     runs-on: ubuntu-latest
     steps:
       - name: Download artifact
