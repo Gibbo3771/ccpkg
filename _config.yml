@@ -38,7 +38,7 @@ github:
 plugins:
   - jekyll-feed
   - jekyll-datapage-generator
-
+  - jekyll-gist
 # page_gen-dirs: true
 
 page_gen:

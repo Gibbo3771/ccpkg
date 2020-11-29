@@ -18,6 +18,7 @@ group :jekyll_plugins do
   gem "jekyll-datapage-generator"
   gem "kramdown-parser-gfm"
   gem 'jekyll-download-masterfile', '0.1.0', :path => '_plugins/jekyll-download-masterfile'
+  gem 'jekyll-gist'
 end
 
 # Windows and JRuby does not include zoneinfo files, so bundle the tzinfo-data gem

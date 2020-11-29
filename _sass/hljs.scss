@@ -1,4 +1,44 @@
 /*! tomorrow night eighties; https://github.com/MozMorris/tomorrow-pygments */
+.hljs {
+  pre, table {
+    background: #2d2d2d !important;
+    color: #cccccc !important;
+  }
+  &-comment {
+    color: #999999 !important;
+  }
+  &-keyword {
+    color: #cc99cc !important;
+  }
+  &-error {
+    color: #f2777a !important;
+  }
+  &-literal {
+    color: #f99157 !important;
+  }
+  &-operator {
+    color: #66cccc !important;
+  }
+  &-number {
+    color: #f99157 !important;
+  }
+  &-string {
+    color: #99cc99 !important;
+  }
+  &-variable {
+  color: #f2777a !important;
+  }
+  &-title {
+  color: #6699cc !important;
+  }
+  &-built_in {
+    color: #cccccc !important;
+
+  }
+}
+
+// TODO convert the below to highlight js as required
+
 .highlight,
 .highlight pre,
 .highlight table {
@@ -8,25 +48,10 @@
 .highlight .hll {
   background-color: #515151 !important;
 }
-.highlight .c {
-  color: #999999 !important;
-} /* Comment */
-.highlight .err {
-  color: #f2777a !important;
-} /* Error */
-.highlight .k {
-  color: #cc99cc !important;
-} /* Keyword */
-.highlight .l {
-  color: #f99157 !important;
-} /* Literal */
 .highlight .n,
 .highlight .h {
   color: #cccccc !important;
 } /* Name */
-.highlight .o {
-  color: #66cccc !important;
-} /* Operator */
 .highlight .p {
   color: #cccccc !important;
 } /* Punctuation */
@@ -87,18 +112,9 @@
 .highlight .ld {
   color: #99cc99 !important;
 } /* Literal.Date */
-.highlight .m {
-  color: #f99157 !important;
-} /* Literal.Number */
-.highlight .s {
-  color: #99cc99 !important;
-} /* Literal.String */
 .highlight .na {
   color: #6699cc !important;
 } /* Name.Attribute */
-.highlight .nb {
-  color: #cccccc !important;
-} /* Name.Builtin */
 .highlight .nc {
   color: #ffcc66 !important;
 } /* Name.Class */
@@ -114,9 +130,6 @@
 .highlight .ne {
   color: #f2777a !important;
 } /* Name.Exception */
-.highlight .nf {
-  color: #6699cc !important;
-} /* Name.Function */
 .highlight .nl {
   color: #cccccc !important;
 } /* Name.Label */
@@ -132,9 +145,6 @@
 .highlight .nt {
   color: #66cccc !important;
 } /* Name.Tag */
-.highlight .nv {
-  color: #f2777a !important;
-} /* Name.Variable */
 .highlight .ow {
   color: #66cccc !important;
 } /* Operator.Word */
