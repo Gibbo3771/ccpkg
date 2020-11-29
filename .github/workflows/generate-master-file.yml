@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  create-materfile:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -50,7 +50,7 @@ jobs:
           name: masterfile
           path: ./
           
-  deploy:
+  update-masterfile-gist:
     needs: build
     runs-on: ubuntu-latest
     steps:
@@ -65,4 +65,13 @@ jobs:
           gist_id: 016d79e59aa38c80b5deff881455d22f
           gist_file_name: masterfile.json
           file_path: ./masterfile.json
+  deploy-site:
+    needs: update-masterfile-gist
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run build hook
+        run: curl -X POST -d {} ${{ secrets.NETLIFY_BUILD_HOOK }}
+
+
+
 
